@@ -565,7 +565,7 @@ class Classroom_model extends CI_Model {
 
             }
         } 
-
+ 
         return $res;  
     }
 
@@ -584,6 +584,44 @@ class Classroom_model extends CI_Model {
       
         return $res;
 
+    }
+
+
+     /* Fungsi untuk mengambil data kelas dan agrowallet jika terhubung */
+    // Auth : KDE
+    // Date : 25.04.2024
+    /* End Fungsi */
+
+    function getclasswallet($cr=null){
+      
+
+            $this->db->select('_classroom.*,_category.cat_name,_category.cat_id, _user.user_name,wl.kode,wl.deskripsi as desc2,wl.silabus,wl.sasaran_pembelajaran');
+    
+            $this->db->from('_classroom');
+
+            $this->db->join('_learning_wallet_classroom as wl','wl.id=_classroom.id_lw_classroom','LEFT');
+    
+            $this->db->join('_category','_category.cat_id=_classroom.cat_id','LEFT');
+    
+            $this->db->join('_user','_user.user_id=_classroom.id_petugas','LEFT');
+    
+    
+    
+            $this->db->where('cr_id', $cr);
+    
+    
+    
+    
+    
+            $query      = $this->db->get();
+            $syntax     =$this->db->last_query();
+            $result     = $query->result_array();
+
+
+    
+    
+            if($query->num_rows() > 0){ return $result[0]; } else { return FALSE; }
+    
     }
 
 }

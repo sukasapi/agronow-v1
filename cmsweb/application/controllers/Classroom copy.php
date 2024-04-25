@@ -6644,6 +6644,7 @@ class Classroom extends CI_Controller {
 
 
     function test(){
-        
+        echo "ini test github";
+        exit;
     }
 }

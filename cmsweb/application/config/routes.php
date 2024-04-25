@@ -52,3 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'dashboard';
 $route['404_override'] = 'custom404';
 $route['translate_uri_dashes'] = FALSE;
+
+
+///report
+$route['laporan_kelas/(:num)']='Report_oneclick/index/$1';

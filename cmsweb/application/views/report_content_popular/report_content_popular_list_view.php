@@ -11,15 +11,7 @@ $actual_link = urlencode($actual_link);
     <div class="kt-subheader kt-grid__item" id="kt_subheader">
         <div class="kt-subheader__main">
             <h3 class="kt-subheader__title"><?php echo $page_sub_name; ?></h3>
-            <!--<span class="kt-subheader__separator kt-subheader__separator--v"></span>
-
-            <a href="<?php /*echo site_url("ads/create/"); */?>" class="btn btn-brand kt-margin-l-10">
-                Tambah
-            </a>-->
         </div>
-
-
-
     </div>
     <!-- end:: Subheader -->
 
