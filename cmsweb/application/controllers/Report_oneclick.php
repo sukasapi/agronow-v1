@@ -35,8 +35,14 @@ class Report_oneclick extends CI_Controller {
             $dtevaluasi=array();
           
             $data['kelas']=$dtkelas;
-            $data['peserta']=$dtpeserta;
             $data['evaluasi']=$dtevaluasi;
+
+            //data peserta
+            $filter=" WHERE c.cr_id='".$cr."'";
+            $data['peserta']['test'] = $this->classroom_model->get_posttes($filter);
+            $data['peserta']['detail'] = $this->classroom_model->get_posttes($filter);
+            //tambahan
+            $data['peserta']['feedback']=$this->classroom_model->get_feedback($filter);
 
             $data['page_sub_name']="Laporan Kelas";
             $data['page_name']      = 'Laporan';
@@ -64,6 +70,13 @@ class Report_oneclick extends CI_Controller {
         }else{
             return $get_classroom;
         }
+    }
+
+
+    function get_peserta($filter){
+        $get_peserta =array();
+
+        return $get_peserta();
     }
 
 }

@@ -34,27 +34,27 @@ $actual_link = urlencode($actual_link);
                         ?>
                         </h5>                       
                         <hr>
-                        <p class="my-4">
-                            <?php 
-                                if($kelas['desc2']!=""){
-                                    echo $kelas['desc2'];
-                                }else{
-                                    echo   $kelas['cr_desc'];
-                                }
-                            ?>
-                        </p>
-                        <div class="row">
-                            <div class="col-md-4 col-xs-12">
-                                    <button class="btn btn-rounded btn-primary" id="bsasaran">Sasaran</button>
-                                    <button class="btn btn-rounded btn-warning" id="bsilabus">Silabus</button>
-                                    <button class="btn btn-rounded btn-success" id="bdetil">Detail</button>
+                        <div class="text-center">
+                         
+                                <div class="d-flex justify-content-center">
+                                    <p class="my-4">
+                                        <?php 
+                                            if($kelas['desc2']!=""){
+                                                echo $kelas['desc2'];
+                                            }else{
+                                                echo   $kelas['cr_desc'];
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
+                     
+                            <div class="d-flex justify-content-center">
+                                        <button class="btn btn-rounded btn-primary mx-2" id="bsasaran">Sasaran</button>
+                                        <button class="btn btn-rounded btn-warning mx-2" id="bsilabus">Silabus</button>
+                                        <button class="btn btn-rounded btn-success mx-2" id="bdetil">Detail</button>
                             </div>
+                    
                         </div>
-                        <hr>
-                </div>
-                <div class="card-footer">
-                       
-                       
                 </div>
                 </div>
             </div>
@@ -242,8 +242,8 @@ $actual_link = urlencode($actual_link);
         <!-- PESERTA --> 
         <div class="row">
             <div class="col-md-12 col-xs-12 my-2">
-                <div class="card" style="border-radius:20px">
-                                <div class="card-header bg-primary">
+                <div class="card shadow" style="border-radius:20px">
+                                <div class="card-header bg-primary" style="border-top-left-radius:20px;border-top-right-radius:20px">
                                     <div class="card-title text-white"><h4>Peserta</h4></div>
                                 </div>
                     <div class="card-body">
@@ -296,11 +296,129 @@ $actual_link = urlencode($actual_link);
                                     </div>
                                 </div>
                             </div>
-                          
                         </div>
-                        <div class="row mb-4">
-                            
+
+                        <div class="row">
+                            <div class="col-md-12 border border-primary">
+                                <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="one-tab" data-toggle="tab" href="#TabTest" role="tab" aria-controls="One" aria-selected="true">Hasil Ujian</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="two-tab" data-toggle="tab" href="#TabFeedback" role="tab" aria-controls="Two" aria-selected="false">Feedback Peserta</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="three-tab" data-toggle="tab" href="#TabPresensi" role="tab" aria-controls="Three" aria-selected="false">Presensi</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content" id="myTabContent">
+                                    <div class="tab-pane fade show active p-3" id="TabTest" role="tabpanel" aria-labelledby="one-tab">
+                                        <h5 class="card-title">Hasil Tes Peserta</h5>
+                                        <div class="table-responsive">
+                                            <table class="table" id="tbTest" style="width:100%">
+                                                <thead>
+                                                    <tr class='text-center'>
+                                                        <th>No</th>
+                                                        <th>Nip</th>
+                                                        <th>Nama</th>
+                                                        <th>Entitas</th>
+                                                        <th>Pre-Test</th>
+                                                        <th>Post-Test</th>
+                                                        <th>Status</th>
+                                                        <th>Progress</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php 
+                                                        $no=1;
+                                                        $str="";
+                                                        foreach($peserta['test'] as $tes){
+                                                            $pre=isset($tes['prescore']) && $tes['prescore']!=""?$tes['prescore']:0;
+                                                            $score=isset($tes['score']) && $tes['score']!=""?$tes['score']:0;
+                                                           
+                                                            if($score > 50 && $tes['score']!=""){
+                                                                $status="<span class='badge badge-success badge-pill'>Lulus</span>";
+                                                            }else if($tes['score']==""){
+                                                                $status="<span class='badge badge-info badge-pill'>Tes tidak ditemukan</span>";
+                                                            }else{
+                                                                $status="<span class='badge badge-danger badge-pill'>Tidak lulus</span>";
+                                                            }
+
+                                                            if($score > $pre){
+                                                                $progress="<i class='fa-solid fa-arrow-up text-success'></i>";
+                                                            }else if($score < $pre){
+                                                                $progress="<i class='fa-solid fa-arrow-down text-danger'></i>";
+                                                            }else{
+                                                                $progress="<i class='fa-solid fa-minus text-warning'></i>";
+                                                            }
+                                                            $str .="<tr>";
+                                                            $str .="<td>".$no."</td>";
+                                                            $str .="<td>".$tes['nip']."</td>";
+                                                            $str .="<td>".$tes['nama']."</td>";
+                                                            $str .="<td>".$tes['perusahaan']."</td>";
+                                                            $str .="<td class='text-center'>".$pre."</td>";
+                                                            $str .="<td class='text-center'>".$score."</td>";
+                                                            $str .="<td class='text-center'>".$status."</td>";
+                                                            $str .="<td class='text-center'>".$progress."</td>";
+                                                            $str .="</tr>";
+                                                            $no++;
+                                                        }
+                                                        echo $str;
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                              
+                                    </div>
+                                    <div class="tab-pane fade p-3" id="TabFeedback" role="tabpanel" aria-labelledby="two-tab">
+                                        <h5 class="card-title">Feedback Peserta</h5>
+                                        <div class="table-responsive">
+                                            <table class="table" id="tbFeedback" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Nip</th>
+                                                        <th>Nama</th>
+                                                        <th>Entitas</th>
+                                                        <th>Level</th>
+                                                        <th>Feedback</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>       
+                                    </div>
+                                    <div class="tab-pane fade p-3" id="TabPresensi" role="tabpanel" aria-labelledby="three-tab">
+                                    <h5 class="card-title">Presensi Peserta</h5>
+                                    <div class="table-responsive">
+                                            <table class="table" id="tbPresensi" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Nip</th>
+                                                        <th>Nama</th>
+                                                        <th>Entitas</th>
+                                                        <th>Level</th>
+                                                        <th>Tanggal</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>          
+                                    </div>
+                                </div>
+                        
                         </div>
+                        
+
+        </div>
+      </div>
                     </div>
                 </div>
             </div>
@@ -327,5 +445,14 @@ $actual_link = urlencode($actual_link);
                 e.preventDefault();
                 $('#mddetil').modal('show');
             })
+
+
+            Swal.fire({
+                position: "top-end",
+                type: "warning",
+                title: "Fitur ini masih dalam tahap pengembangan",
+                showConfirmButton: false,
+                timer: 1500
+                });
     });
 </script>
