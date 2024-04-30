@@ -56,3 +56,4 @@ $route['translate_uri_dashes'] = FALSE;
 
 ///report
 $route['laporan_kelas/(:num)']='Report_oneclick/index/$1';
+$route['laporan_tracking_whislist']='Report_oneclick/tracking_whislist';

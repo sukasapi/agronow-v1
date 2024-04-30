@@ -18,7 +18,7 @@ $actual_link = urlencode($actual_link);
         <!--- KELAS -->
         <div class="row">
             <div class="col-md-12 col-xs-12 my-2">
-                <div class="card" style="border-radius:20px">
+                <div class="card bg-primary">
                     <div class="card-body">
                         <h1><?=$kelas['cr_name']?></h1>
                         <h4><?= parseDateReadable($kelas['cr_date_start'])?> hingga <?= parseDateReadable($kelas['cr_date_end'])?></h4>

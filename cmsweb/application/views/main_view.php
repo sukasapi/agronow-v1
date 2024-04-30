@@ -767,7 +767,25 @@
                                         </a>
                                     </li>
                                     <?php endif; ?>
-                                         <!--- NPS -->
+                                    <?php if(has_access('classroom.view',FALSE)): ?>
+                                    <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='classroom_soal'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('classroom/test_result'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Laporan Kelas</span>
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
+                                    <!-- TRACKING WHISLIST -->
+                                     <!-- KDW 3004024 -->
+                                    <?php if(has_access('classroom.view',FALSE)): ?>
+                                    <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='classroom_soal'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('laporan_tracking_whislist'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Tracking Whistlist</span>
+                                        </a>
+                                    </li>
+                                    <?php endif; ?> 
+                                    <!--- NPS -->
                                     <!-- KDW 30012024 -->
                                     <!--- 1. Bank Soal -->
                                     <!--- 2. Report -->

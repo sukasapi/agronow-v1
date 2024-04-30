@@ -20,6 +20,7 @@ class Report_oneclick extends CI_Controller {
        
         $this->load->model('Project_assignment_model','pa');
         $this->load->model('Classroom_evaluasi_model','ce');
+        $this->load->model('Report_oneclick_model','ro');
         $this->load->helper('classroom_helper');
         $select_tree = [];
         $this->section_id = 30;
@@ -77,6 +78,46 @@ class Report_oneclick extends CI_Controller {
         $get_peserta =array();
 
         return $get_peserta();
+    }
+
+
+
+   // whislist dan tracking persetujuan peserta kelas
+   // auth :KDW
+   // date : 30.04.2024
+
+    function tracking_whislist(){
+        has_access('classroom.view');
+        $pesan="";
+        $url_return = $this->input->get('url_return');
+        if(empty($url_return)){
+            $url_return = site_url('classroom');
+        }
+
+        //whislist tracking
+        $mulai=isset($_POST['startDate']) && $_POST['startDate']!=""?$_POST['startDate']:date('Y-01-01');
+        $selesai=isset($_POST['endDate']) && $_POST['endDate']!=""?$_POST['endDate']:date('Y-12-31');
+        $filter1 ="WHERE m.member_name <>'Tim Developer IT'
+            AND wl.status = 'aktif' AND wc.tgl_mulai >='".$mulai."' AND wc.tgl_mulai<='".$selesai."' ";
+        $datawhistlist=$this->ro->get_daftar_whislist($filter1);
+        $data['whislist']=$datawhistlist;
+
+        //peserta approvall
+        $filter2 ="WHERE m.member_name <>'Tim Developer IT'
+        AND wc.tgl_mulai >='".$mulai."' AND wc.tgl_mulai<='".$selesai."' ";
+        $datatrack=$this->ro->get_approval_peserta($filter2);
+        $data['tracking']=$datatrack;
+        
+
+        ///display
+        $data['start']=$mulai;
+        $data['end']=$selesai;
+        $data['page_sub_name']="Laporan Whislist dan Tracking Approval";
+        $data['page_name']      = 'Laporan';
+        $data['page'] = 'report/v_whistlist_track';
+        $data['submenu'] = 'classroom/classroom_detail_submenu_view';
+        $this->load->view('main_view',$data);
+
     }
 
 }
