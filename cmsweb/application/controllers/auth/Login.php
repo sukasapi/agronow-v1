@@ -23,7 +23,7 @@ class Login extends CI_Controller {
         sleep(1);
         $get_user = $this->user_model->login($email,$password);
         if ($get_user!=FALSE) {
-            return TRUE;
+            return TRUE; 
         }else{
             $message = "Invalid Email or Password";
 

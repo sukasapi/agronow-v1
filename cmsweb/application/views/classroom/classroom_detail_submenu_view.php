@@ -70,7 +70,7 @@ if(
         
         
 		<?php } ?>
-        <a href="<?php echo site_url('classroom/laporan_kelas/').$cr_id; ?>" style="background-color:#192a56;color:#fbc531" class="list-group-item list-group-item-action <?php echo ($this->uri->segment(2)=='member')?'active':NULL; ?>"><i class="fas fa-desktop"></i> ONE CLICK REPORT </a>
+        <a href="<?php echo site_url('laporan_kelas/').$cr_id; ?>" style="background-color:#192a56;color:#fbc531" class="list-group-item list-group-item-action <?php echo ($this->uri->segment(2)=='member')?'active':NULL; ?>"><i class="fas fa-desktop"></i> ONE CLICK REPORT </a>
     </div>
 
     <!-- START PORTLET DELETE -->

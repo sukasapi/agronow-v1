@@ -129,7 +129,7 @@ $actual_link = urlencode($actual_link);
 							<div class="kt-portlet__body">
 								<ul class="nav nav-tabs" id="myTab" role="tablist">
 									<li class="nav-item">
-										<a class="nav-link active" id="waiting-tab" data-toggle="tab" href="#waiting" role="tab">Menunggu Persetujuan</a>
+										<a class="nav-link active" id="waiting-tab" data-toggle="tab" href="#waiting" role="tab">Menunggu Persetujuan / Dibatalkan Sistem</a>
 									</li>
 									<li class="nav-item">
 										<a class="nav-link" id="disetujui-tab" data-toggle="tab" href="#disetujui" role="tab">Disetujui</a>
@@ -161,8 +161,8 @@ $actual_link = urlencode($actual_link);
 												</tbody>
 												<?=$usp_simpan_ui?>
 											</table>
-											<?php echo form_close(); ?>
 										</div>
+										<?php echo form_close(); ?>
 									</div>
 									<div class="tab-pane fade" id="disetujui" role="tabpanel">
 										<div class="table-responsive">
@@ -231,7 +231,7 @@ function ganti(id_pengajuan,nik) {
 }
 
 function konfirm(ele) {
-	var flag = confirm("Anda yakin ingin menyimpan data? Data sudah disimpan tidak dapat dikoreksi.");
+	var flag = confirm("Anda yakin ingin menyimpan data?");
 	if(flag==false) return ;
 	else $("#"+ele).submit();
 }

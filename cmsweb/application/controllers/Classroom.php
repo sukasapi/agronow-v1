@@ -222,7 +222,6 @@ class Classroom extends CI_Controller {
 
             $post = $this->input->post();
 			
-       
 			if($post['cr_kelola']=="luar_app") {
 				$post['cr_has_certificate'] = 0;
 				$post['cr_has_prelearning'] = 0;
@@ -239,7 +238,7 @@ class Classroom extends CI_Controller {
                 'cr_name'           => $post['cr_name'],
                 'cat_id'            => $post['cat_id'],
 				'id_lw_classroom'   => (int) $post['id_lw_classroom'],
-				'id_superapp_manpro'   => isset($post['id_superapp_manpro'])?(int) $post['id_superapp_manpro']:"", //update 07022024,
+				'id_superapp_manpro'   => isset($post['id_superapp_manpro'])?(int) $post['id_superapp_manpro']:"", //update 07022024,,
 				'kode_superapp_manpro' => $post['kode_superapp_manpro'],
 				'cr_kelola'         => $post['cr_kelola'],
                 'cr_desc'           => $post['cr_desc'],
@@ -268,8 +267,10 @@ class Classroom extends CI_Controller {
                 'cr_has_knowledge_management' => $post['cr_has_knowledge_management'],
 				'cr_has_project_assignment' => $post['cr_has_project_assignment'],
                 'id_petugas' => user_id(),
+                'lk_absen'=>$post['linkabsen'],
+                'lk_dokumentasi'=>$post['linkdoc']
             );
-        
+
             $extra_cr_prelearning = array(
                 'Desc'      => NULL,
                 'Alert'     => NULL,
@@ -352,21 +353,18 @@ class Classroom extends CI_Controller {
                     'cat_status'  => '1',
                 );
 
-                $insert_cat = $this->category_model->insert($data_cat);
+                //$insert_cat = $this->category_model->insert($data_cat);
                  
+                //22022024
+                $posteval=false;
                 
                 /* EVALUASI NPS */
                 // 13042022 - KDW
                 //Jika ada diklat superapp maka update di diklat superapp
-
-                $posteval=false;
-
-               
                 $id_manpro=isset($post['id_superapp_manpro'])?(int) $post['id_superapp_manpro']:""; //update 07022024
 
                 $id_agronow= $insert;
-                
-                //update 07022024
+
                 if(!empty($id_manpro) || $id_manpro!=""){   //update 07022024
                      $url=URL_SIP_PROJECT;
                      $data=array("app"=>"postman","key"=>"dpostman","act"=>"link_diklat","agro_kelas"=>$id_agronow,"superapp_diklat"=>$id_manpro);
@@ -379,8 +377,6 @@ class Classroom extends CI_Controller {
                                 );
                     $response=file_get_contents($url,false,stream_context_create($options));
                     $result=json_decode($response);
-                }else{
-
                 }
 
                 /// Create: 18.01.2024
@@ -396,7 +392,7 @@ class Classroom extends CI_Controller {
                     $jenis ="internal";
                 }
                  $pesan="";
-                 if(isset($post['ev_penyelenggaraan']) && $post['ev_penyelenggaraan'] > 0){
+                if(isset($post['ev_penyelenggaraan']) && $post['ev_penyelenggaraan'] > 0){
                     //getsoal penyelenggaraan
                    
                     $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
@@ -465,15 +461,14 @@ class Classroom extends CI_Controller {
                 }else{
 
                 }*/
-
                 /* END EVALUASI NPS */
+
                 $url_return = site_url('classroom/detail/').$insert;
                 if($posteval==false){
                     flash_notif_success($pesan,$url_return);
                 }else{
                     flash_notif_success(NULL,$url_return);
                 }
-              
             }else{
                 flash_notif_failed(NULL,$url_return);
             }
@@ -482,13 +477,12 @@ class Classroom extends CI_Controller {
     }
 
     function edit($classroom_id=NULL){
-
+        
         $classroom = $this->get_classroom($classroom_id);
 
         if (!is_classroom_editable($classroom_id)){
             redirect(404);
         }
-
 
         $url_return = $this->input->get('url_return');
         if(empty($url_return)){
@@ -521,13 +515,13 @@ class Classroom extends CI_Controller {
              $evaluasi = $this->ce->cek_setsoal(array("cr_id"=>$classroom_id,"status"=>"1"));
              $data['evaluasi']=$evaluasi;
 
-             /* Pin value */
+             /* Pin value - 22022024*/
              $pin=isset($post['cr_pin']) && $post['cr_pin']!="" ?$post['cr_pin']:pinGenerator(8);
              $data['pin']=$pin;
-         /* End Evaluasi*/
+            /* End Evaluasi*/
 
             $data['request']            = $classroom;
-            $data['classroom']            = $classroom;
+            $data['classroom']          = $classroom;
             $data['url_return']         = $url_return;
             $data['form_action']        = site_url('classroom/edit').'/'.$classroom_id;
             $data['editable']           = TRUE;
@@ -549,12 +543,12 @@ class Classroom extends CI_Controller {
 				$post['cr_has_learning_point'] = 0;
 				$post['cr_has_knowledge_management'] = 0;
 				$post['cr_has_project_assignment'] = 0;
-               // $post['ev_penyelenggaraan']=0;
-               //$post['ev_sarana']=0;
-               // $post['ev_narsum']=0;
+                ///07022024
+                //$post['ev_penyelenggaraan']=0;
+                //$post['ev_sarana']=0;
+                //$post['ev_narsum']=0;
 			}
 
-            
             $data = array(
                 'cr_id'  => $post['cr_id']==NULL?NULL:$post['cr_id'],
                 'cr_name'           => $post['cr_name'],
@@ -587,6 +581,8 @@ class Classroom extends CI_Controller {
                 'cr_has_learning_point' => $post['cr_has_learning_point'],
                 'cr_has_knowledge_management' => $post['cr_has_knowledge_management'],
 				'cr_has_project_assignment' => $post['cr_has_project_assignment'],
+                'lk_absen'=>$post['linkabsen'],
+                'lk_dokumentasi'=>$post['linkdoc']
 
             );
             
@@ -620,187 +616,183 @@ class Classroom extends CI_Controller {
 
             $edit = $this->classroom_model->update($data);
 
-                
+            //07022024
             $posteval=true;
             $pesan ="";
-
+            //22022024
             $jenis=$post['cr_kelola']=="dalam_app"?"internal":"eksternal";
-
-            //print_r($post);
-            //exit;
+            
             if ($edit==TRUE) {
-                 // 13042022 - KDW
-                //Jika ada diklat superapp maka update di diklat superapp
-                $id_manpro=(int) $post['id_superapp_manpro'];
-                $id_agronow= $post['cr_id'];
-                     $url=URL_SIP_PROJECT;
-                     $data=array("app"=>"postman","key"=>"dpostman","act"=>"link_diklat","agro_kelas"=>$id_agronow,"superapp_diklat"=>$id_manpro);
-                     $options = array(
-                                    "http"=> array(
-                                    "method"=>"POST",
-                                    "header"=>"Content-Type: application/x-www-form-urlencoded",
-                                    "content"=>http_build_query($data)
-                                    ) 
-                                );
-                    $response=file_get_contents($url,false,stream_context_create($options));
-                    $result=json_decode($response);
-                ////// END diklat superapp    
+                // 13042022 - KDW
+               //Jika ada diklat superapp maka update di diklat superapp
+               $id_manpro=(int) $post['id_superapp_manpro'];
+               $id_agronow= $post['cr_id'];
+                    $url=URL_SIP_PROJECT;
+                    $data=array("app"=>"postman","key"=>"dpostman","act"=>"link_diklat","agro_kelas"=>$id_agronow,"superapp_diklat"=>$id_manpro);
+                    $options = array(
+                                   "http"=> array(
+                                   "method"=>"POST",
+                                   "header"=>"Content-Type: application/x-www-form-urlencoded",
+                                   "content"=>http_build_query($data)
+                                   )
+                               );
+                   $response=file_get_contents($url,false,stream_context_create($options));
+                   $result=json_decode($response);
+               ////// END diklat superapp    
 
-                 /// Create: 18.01.2024
-                 /// Auth : KDW
-                 ///evaluasi kelas
-              
-                 $cr_id=$post['cr_id'];
-                 $msgeval="";
-                 if(isset($post['ev_penyelenggaraan']) && count((array)$post['ev_penyelenggaraan']) > 0){
-                     //update status set_soal
-                     $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
-                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
-                     $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                     if($updateevaluasi){
-                        $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
-                        $posteval=true;
-                    }else{
-                        $pesan.="evaluasi sarana gagal terbuat<br/>";
-                        $posteval=false;
-                    }
-                     $msgeval.=" penyelenggaraan  teredit<br>";
-                 }else{
-                     //update status set_soal
-                     $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
-                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
-                     $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                 } 
- 
-                 if(isset($post['ev_sarana']) && count((array)$post['ev_sarana']) > 0){
-                     //update status set_soal
-                     $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
-                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
-                     $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                     $msgeval.=" sarana teredit<br>";
-                     if($updateevaluasi){
-                        $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
-                        $posteval=true;
-                    }else{
-                        $pesan.="evaluasi sarana gagal terbuat<br/>";
-                        $posteval=false;
-                    }
-                 }else{
-                      //update status set_soal
-                      $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
-                      $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
-                      $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                 }
-                  
-                 
-                 if(isset($post['ev_narsum']) && count((array)$post['ev_narsum']) > 0){
-                     foreach($post['narsum'] as $n){
-                        $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
-                        $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"narasumber","status"=>"1","pengajar"=>$n,"setsoal"=>$setsoal,"tipe"=>$jenis); 
-                        $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                        if($updateevaluasi){
-                            $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
-                            $posteval=true;
-                        }else{
-                            $pesan.="evaluasi narasumber gagal terbuat<br/>";
-                            $posteval=false;
-                        }
-                        $msgeval.=" narsum ".$n." teredit - evaluasi ".$updateevaluasi."<br>";
-                     }
-                 }else{
-                    foreach($post['narsum'] as $n){
-                        $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
-                        $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"narasumber","status"=>"0","pengajar"=>$n,"setsoal"=>$setsoal,"tipe"=>$jenis); 
-                        $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                        if($updateevaluasi){
-                            $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
-                            $posteval=true;
-                        }else{
-                            $pesan.="evaluasi narasumber gagal terbuat<br/>";
-                            $posteval=false;
-                        }
-                        $msgeval.=" narsum ".$n." teredit - evaluasi ".$updateevaluasi."<br>";
-                     }
-                 }
-
-                //07022023
-                //tambahan untuk evaluasi external
-                //BATAL
-                /*
-                if(isset($post['ev_external']) && $post['ev_external'] > 0){
-                    //getsoal penyelenggaraan
-                    $setsoal=$this->ce->set_soalbyType("external","external");
-                    $inputevaluasi=array('cr_id'=> $cr_id,'jenis'=>'external','status'=>'1','setsoal'=>$setsoal);
-                    $updateevaluasi=$this->ce->edit_setsoal($inputevaluasi);
+                /// Create: 18.01.2024
+                /// Auth : KDW
+                ///evaluasi kelas
+                $jenis=$post['cr_kelola']=="dalam_app"?"internal":"eksternal";
+                $cr_id=$post['cr_id'];
+                $msgeval="";
+                if(isset($post['ev_penyelenggaraan']) && $post['ev_penyelenggaraan'] != "0"){
+                    //update status set_soal
+                    $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
+                    $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
+                    $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
                     if($updateevaluasi){
-                        $pesan.="kelas dengan evaluasi untuk external telah terbuat<br/>";
-                        $posteval=true;
-                    }else{
-                        $pesan.="evaluasi sarana gagal terbuat<br/>";
-                        $posteval=false;
-                    }
+                       $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
+                       $posteval=true;
+                   }else{
+                       $pesan.="evaluasi sarana gagal terbuat<br/>";
+                       $posteval=false;
+                   }
+                    $msgeval.=" penyelenggaraan  teredit<br>";
                 }else{
-                        //update status set_soal
-                        $setsoal=$this->ce->set_soalbyType("external",$jenis);
-                        $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"external","status"=>"0","setsoal"=>$setsoal);
-                        $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                }
-                */
-                //create_log($this->section_id,$classroom_id,'Edit',NULL);
-                if($posteval==TRUE){
-                    flash_notif_success(NULL,$url_return);
-                }else{
-                    flash_notif_success($pesan,$url_return);
-                }
-               
-            }else{
-               
-                 // 13042022 - KDW
-                 /// Create: 07.02.2024 
-                 /// Auth : KDW
-                 ///evaluasi kelas jika 
-
-                 //12.02.2024 --> dalam_app = internal, lainnya eksternal
-                
-                 $cr_id=$post['cr_id'];
-                 $msgeval="";
-                 if(isset($post['ev_penyelenggaraan']) && count((array)$post['ev_penyelenggaraan']) > 0){
-                     //update status set_soal
-                     $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
-                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
-                     $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                     $msgeval.=" penyelenggaraan  teredit<br>";
-                 }else{
                     //update status set_soal
                     $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
                     $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                 } 
+                } 
 
-                 if(isset($post['ev_sarana']) && count((array)$post['ev_sarana']) > 0){
+                if(isset($post['ev_sarana']) &&$post['ev_sarana'] != "0"){
+                    //update status set_soal
+                    $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
+                    $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
+                    $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                    $msgeval.=" sarana teredit<br>";
+                    if($updateevaluasi){
+                       $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
+                       $posteval=true;
+                   }else{
+                       $pesan.="evaluasi sarana gagal terbuat<br/>";
+                       $posteval=false;
+                   }
+                }else{
                      //update status set_soal
                      $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
-                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
+                     $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
                      $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                     $msgeval.=" sarana teredit<br>";
-                 }else{
-                    $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
-                    $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
-                    $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                 }
-                  
+                }
                  
-                 if(isset($post['ev_narsum']) && count((array)$post['ev_narsum']) > 0){
-                    if(count((array)$post['ev_narsum'])>0){
+                
+                if(isset($post['ev_narsum']) && $post['ev_narsum'] != "0"){
+                    foreach($post['narsum'] as $n){
+                       $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
+                       $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"narasumber","status"=>"1","pengajar"=>$n,"setsoal"=>$setsoal,"tipe"=>$jenis); 
+                       $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                       if($updateevaluasi){
+                           $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
+                           $posteval=true;
+                       }else{
+                           $pesan.="evaluasi narasumber gagal terbuat<br/>";
+                           $posteval=false;
+                       }
+                       $msgeval.=" narsum ".$n." teredit - evaluasi ".$updateevaluasi."<br>";
+                    }
+                }else{
+                   foreach($post['narsum'] as $n){
+                       $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
+                       $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"narasumber","status"=>"0","pengajar"=>$n,"setsoal"=>$setsoal,"tipe"=>$jenis); 
+                       $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                       if($updateevaluasi){
+                           $pesan.="kelas dengan evaluasi untuk external telah terupdate<br/>";
+                           $posteval=true;
+                       }else{
+                           $pesan.="evaluasi narasumber gagal terbuat<br/>";
+                           $posteval=false;
+                       }
+                       $msgeval.=" narsum ".$n." teredit - evaluasi ".$updateevaluasi."<br>";
+                    }
+                }
+
+               //07022023
+               //tambahan untuk evaluasi external
+               //BATAL
+               /*
+               if(isset($post['ev_external']) && $post['ev_external'] > 0){
+                   //getsoal penyelenggaraan
+                   $setsoal=$this->ce->set_soalbyType("external","external");
+                   $inputevaluasi=array('cr_id'=> $cr_id,'jenis'=>'external','status'=>'1','setsoal'=>$setsoal);
+                   $updateevaluasi=$this->ce->edit_setsoal($inputevaluasi);
+                   if($updateevaluasi){
+                       $pesan.="kelas dengan evaluasi untuk external telah terbuat<br/>";
+                       $posteval=true;
+                   }else{
+                       $pesan.="evaluasi sarana gagal terbuat<br/>";
+                       $posteval=false;
+                   }
+               }else{
+                       //update status set_soal
+                       $setsoal=$this->ce->set_soalbyType("external",$jenis);
+                       $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"external","status"=>"0","setsoal"=>$setsoal);
+                       $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+               }
+               */
+               create_log($this->section_id,$classroom_id,'Edit',NULL);
+               if($posteval==TRUE){
+                   flash_notif_success(NULL,$url_return);
+               }else{
+                   flash_notif_success($pesan,$url_return);
+               }
+              
+           }else{
+                // 13042022 - KDW
+                /// Create: 07.02.2024 
+                /// Auth : KDW
+                ///evaluasi kelas jika 
+                $tesresult=array();
+                //12.02.2024 --> dalam_app = internal, lainnya eksternal
+                $jenis=$post['cr_kelola']=="dalam_app"?"internal":"eksternal";
+               
+                $cr_id=$post['cr_id'];
+                $msgeval="";
+                if(isset($post['ev_penyelenggaraan']) && $post['ev_penyelenggaraan'] != "0"){
+                    //update status set_soal
+                    $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
+                    $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
+                    $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                    $msgeval.=" penyelenggaraan  teredit<br>";
+                }else{
+                   //update status set_soal
+                   $setsoal=$this->ce->set_soalbyType("penyelenggaraan",$jenis);
+                   $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"penyelenggaraan","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
+                   $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                } 
+                $tesresult['penyelenggaraan']=$setsoal;
+
+                if(isset($post['ev_sarana']) && $post['ev_sarana']!= "0"){
+                    //update status set_soal
+                    $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
+                    $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"1","setsoal"=>$setsoal,"tipe"=>$jenis);
+                    $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                    $msgeval.=" sarana teredit<br>";
+                }else{
+                   $setsoal=$this->ce->set_soalbyType("sarana",$jenis);
+                   $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"sarana","status"=>"0","setsoal"=>$setsoal,"tipe"=>$jenis);
+                   $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+                }
+                 
+                $tesresult['sarana']=$setsoal;
+              
+                if(isset($post['ev_narsum']) && $post['ev_narsum'] != "0"){
                      foreach($post['narsum'] as $n){
                             $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
                             $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"narasumber","status"=>"1","pengajar"=>$n,"setsoal"=>$setsoal,"tipe"=>$jenis); 
                             $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
                             $msgeval.=" narsum ".$n." teredit - evaluasi ".$updateevaluasi."<br>";
-                     }                        
-                    }else{
-
-                    }
+                     }                       
                  }else{
                         //edit 04042024
                         $setsoal=$this->ce->set_soalbyType("narasumber",$jenis);
@@ -809,36 +801,41 @@ class Classroom extends CI_Controller {
                         $msgeval.=" narsum  teredit - evaluasi ".$updateevaluasi."<br>";
                    
                  }
+                // print_r($post['ev_narsum']);
+                // echo "<br>";
+                // print_r($msgeval);
+                // exit;
+               //07022023
+               //tambahan untuk evaluasi external
+               //batal
+               /*
+               if(isset($post['ev_external']) && $post['ev_external'] > 0){
+                   //getsoal penyelenggaraan
+                   $setsoal=$this->ce->set_soalbyType("external","external");
+                   $inputevaluasi=array('cr_id'=> $cr_id,'jenis'=>'external',"status"=>"1",'setsoal'=>$setsoal);
+                   $updateevaluasi=$this->ce->edit_setsoal($inputevaluasi);
+                   if($updateevaluasi){
+                       $pesan.="kelas dengan evaluasi untuk external telah terbuat<br/>";
+                       $posteval=true;
+                   }else{
+                       $pesan.="evaluasi sarana gagal terbuat<br/>";
+                       $posteval=false;
+                   }
+               }else{
+                       //update status set_soal
+                       $setsoal=$this->ce->set_soalbyType("external",$jenis);
+                       $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"external","status"=>"0","setsoal"=>$setsoal);
+                       $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
+               }
+               */
              
-                //07022023
-                //tambahan untuk evaluasi external
-                //batal
-                /*
-                if(isset($post['ev_external']) && $post['ev_external'] > 0){
-                    //getsoal penyelenggaraan
-                    $setsoal=$this->ce->set_soalbyType("external","external");
-                    $inputevaluasi=array('cr_id'=> $cr_id,'jenis'=>'external',"status"=>"1",'setsoal'=>$setsoal);
-                    $updateevaluasi=$this->ce->edit_setsoal($inputevaluasi);
-                    if($updateevaluasi){
-                        $pesan.="kelas dengan evaluasi untuk external telah terbuat<br/>";
-                        $posteval=true;
-                    }else{
-                        $pesan.="evaluasi sarana gagal terbuat<br/>";
-                        $posteval=false;
-                    }
-                }else{
-                        //update status set_soal
-                        $setsoal=$this->ce->set_soalbyType("external",$jenis);
-                        $dataupdate=array("cr_id"=>$cr_id,"jenis"=>"external","status"=>"0","setsoal"=>$setsoal);
-                        $updateevaluasi=$this->ce->edit_setsoal($dataupdate);
-                }
-                */
-                    flash_notif_warning(NULL,$url_return);
+                   flash_notif_warning(NULL,$url_return);
+             
               
-               
-            }
+           }
 
         }
+    
     }
 
     function delete($classroom_id=NULL){
@@ -3795,6 +3792,13 @@ class Classroom extends CI_Controller {
 
     function member($classroom_id=NULL){
         $classroom = $this->get_classroom($classroom_id);
+		
+		$data['arr_group'] = $this->group_model->get_child_company("","self_child");
+		$data['form_opt_group'] = array();
+		$data['form_opt_group'][''] = '';
+		foreach($data['arr_group'] as $keyG => $valG) {
+			$data['form_opt_group'][$valG['group_id']] = $valG['group_name'];
+		}
 
         $data['member']         = $this->classroom_member_model->get_by_classroom($classroom_id);
         $data['member_count']   = $this->classroom_member_model->count_by_classroom($classroom_id);
@@ -3908,8 +3912,35 @@ class Classroom extends CI_Controller {
         create_log($this->section_id,$classroom_id,'Hapus','Member');
         redirect(site_url('classroom/member/'.$classroom_id));
     }
-
-
+	
+	function member_update_group(){
+		$strError = '';
+		$post = $this->input->post();
+		
+		$group_id = (int) $post['mdl_group_id'];
+		$cr_id = (int) $post['mdl_cr_id'];
+		$crm_id = (int) $post['mdl_crm_id'];
+		
+		if(empty($group_id)) $strError .= '<li>Group masih kosong</li>';
+		if(empty($cr_id)) $strError .= '<li>Classroom masih kosong</li>';
+		if(empty($crm_id)) $strError .= '<li>Peserta masih kosong</li>';
+		
+		$url_return = site_url('classroom/member/'.$cr_id);
+		
+		if(empty($strError)) {
+			$sql = "update _classroom_member set id_group='".$group_id."' where cr_id='".$cr_id."' and crm_id='".$crm_id."' ";
+			$res = $this->db->query($sql);
+			
+			create_log($this->section_id,$cr_id,'Update Group Peserta','');
+			$msg = 'Data berhasil diupdate.';
+			flash_notif_success($msg,$url_return);
+		} else {
+			$msg = 'Data tidak disimpan:<ul>'.$strError.'</ul>';
+			flash_notif_warning($msg,$url_return);
+		}
+		exit;
+    }
+	
     function member_aghris_search($classroom_id=NULL){
         $classroom = $this->get_classroom($classroom_id);
         $data['classroom'] = $classroom;
@@ -6768,13 +6799,14 @@ class Classroom extends CI_Controller {
             $data['end']="";
         }
 
-        $data['page_name']          = "Class Room"; 
+        $data['page_name']          = "Class Room";
         $data['page_sub_name']      = 'Laporan Ujian';
         $data['page']               = 'classroom/classroom_test_result';
         $this->load->view('main_view',$data);
-       
+      
     }
-
+    
+    
     //----------------------//
     // Test Result with feedback Function //
     // Auth : KDW           //
@@ -6788,26 +6820,36 @@ class Classroom extends CI_Controller {
             $mulai=isset($_POST['startDate']) ||$_POST['startDate']!=""?$_POST['startDate']:date();
             $selesai=isset($_POST['endDate']) || $_POST['endDate']!=""?$_POST['endDate']:$_POST['startDate'];
             $filter= "where cm.is_pk='0' AND c.cr_date_start >= '".$mulai." 00:00:00' 
-                      AND c.cr_date_start <='".$selesai." 00:00:00' AND cm.member_id<>'' AND cm.cr_id<>'' AND m.member_name!='test admin'";
+                      AND c.cr_date_start <='".$selesai." 00:00:00'";
         }else{
-            $filter= "Where cm.member_id<>'' AND cm.cr_id<>'' AND m.member_name!='test admin'";
+            $filter= "";
         }
 
         $datafeedback=$this->classroom_model->get_feedback($filter);
         foreach($datafeedback as $fd){
             echo $fd['cr_id'];
-            echo "||".$fd['kelas'];
-            echo "||".$fd['nip'];
-            echo "||".$fd['nama'];
-            echo "||".$fd['member_id'] . "||";
-            print_r($fd['feedback']);
+            echo "-".$fd['kelas'];
+            echo "-".$fd['nip'];
+            echo "-".$fd['nama'];
+            echo "<br>";
+         
+            foreach($fd['feedback'] as $fed){
+                $fbstat=$fed['FbStatus'];
+                if($fbstat > 0){
+                   $fbval=$fed['FbDesc'];
+                }else{
+                    $fbval=$fed['FbDesc'];
+                }
+                echo $fbval;
+                echo "<br>";
+            }
             echo "<hr>";
         }
       
         exit;
     }
 
- 
+
      /*-- Evaluasi Kelas --*/
      // Auth : KDW
      // startDate : 10.01.2024
@@ -6817,7 +6859,7 @@ class Classroom extends CI_Controller {
         $data['evaluasi']=$data;
         $data['tipe']=array('penyelenggaraan','sarana','narasumber','rekomendasi');
         $data['jenis']=array('internal','eksternal');
-        $data['section_id']         = $this->section_id;
+        $data['section_id']     = $this->section_id;
         $data['page_name']          = 'Class Room Evaluasi';
         $data['page_sub_name']      = 'Daftar Pertanyaan Evaluasi Kelas';
         $data['is_content_header']  = TRUE;
@@ -6960,13 +7002,14 @@ class Classroom extends CI_Controller {
                 if(count((array)$isnps) > 0){
                     //cek jawaban
                     $isjawab=$this->ce->get_jawab(array("cr_id"=>$kelas->cr_id));
+                    
                     if(count((array)$isjawab) > 0){
                         foreach($isjawab as $j){
                            
                             $filterresult=array("id"=>$j->id,"status"=>"1");
                             $score=$this->ce->calc_nps($filterresult);
                             $nilai=$score[0]->nilai;
-                            
+                            /////
                             switch($j->jenis){
                                 case 'penyelenggaraan':
                                     $score=$this->ce->calc_nps($filterresult);
@@ -6979,17 +7022,8 @@ class Classroom extends CI_Controller {
                                 case 'narasumber':
                                     $score=$this->ce->calc_nps($filterresult);
                                     $pengajar= $this->ce->cek_setsoal(array("id"=>$j->set_id,"status"=>"1"));
-                                    if(count((array)$pengajar) > 0){
-                                        $result[$j->cr_id][$j->jenis][]=array("score"=>$nilai,"pengajar"=>$pengajar[0]->pengajar,"set_id"=>$j->set_id,"n_kelas"=>$kelas->cr_name);
-                                    } else{
-
-                                    }
+                                    $result[$j->cr_id][$j->jenis][]=array("score"=>$nilai,"pengajar"=>$pengajar[0]->pengajar,"set_id"=>$j->set_id,"n_kelas"=>$kelas->cr_name);
                                 break;
-                           /*   case 'external':
-                                    $score=$this->ce->calc_nps($filterresult);
-                                    $result[$j->cr_id][$j->jenis]=array("score"=>$nilai,"set_id"=>$j->set_id,"n_kelas"=>$kelas->cr_name);
-                                break;
-                            */
                             }
                         }
                     }else{
@@ -7003,9 +7037,7 @@ class Classroom extends CI_Controller {
                
               
             }
-            
-         
-
+        
             foreach($result as $kelas=>$data){
                 foreach($data as $jenis=>$data2){
                  if($jenis=="narasumber"){
@@ -7019,7 +7051,7 @@ class Classroom extends CI_Controller {
                         }
                         $fix_score=round($s/$c,2);
                     }else{
-                        $fix_score=round($data2['score'],2);
+                        $fix_score=$data2['score'];
                         $n_kelas=$data2['n_kelas'];
                        
                     }

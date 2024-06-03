@@ -1,3 +1,16 @@
+<?php
+$ui_alert = '';
+$button_state = '';
+if($classroom['qc_member_id']>0) {
+	$button_state = 'disabled';
+	
+	$sqlT = "select member_name from _member where member_id='".$classroom['qc_member_id']."' ";
+	$resT = $this->db->query($sqlT);
+	$rowT = $resT->result_array();
+	$ui_alert = '<div class="alert alert-info mt-2">Data tidak dapat diupdate karena telah diperiksa oleh '.$rowT['0']['member_name'].' pada '.$classroom['qc_tanggal'].'</div>';
+} 
+?>
+
 <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
 
 
@@ -25,14 +38,16 @@
             <?php
             $this->load->view('flash_notif_view');
             ?>
-
-            <!-- Navigation -->
+			
+			<!-- Navigation -->
             <?php
                 $submenu_data = $classroom;
                 $this->load->view(@$submenu,$submenu_data);
             ?>
 
             <div class="col-lg-9">
+				<?=$ui_alert;?>
+			
                 <!-- START PORTLET MEMBER -->
                 <div class="kt-portlet">
                     <div class="kt-portlet__head">
@@ -41,7 +56,7 @@
                                 Peserta (<?= isset($member_count['total'])?$member_count['total']:0 ?>)
                             </h3>
                         </div>
-                        <div class="kt-portlet__head-toolbar <?= is_classroom_editable($classroom['cr_id'])?'':'d-none' ?>">
+                        <div class="kt-portlet__head-toolbar <?= is_classroom_editable($classroom['cr_id'],'member')?'':'d-none' ?>">
                             <div class="kt-portlet__head-actions">
                                 <a  href="<?php echo site_url('classroom/member_aghris_search/'.$classroom['cr_id']); ?>" class="btn btn-outline-info btn-sm">
                                    Cari di Aghris
@@ -88,9 +103,9 @@
                                         <th>No</th>
                                         <th>Nama</th>
                                         <th>Group</th>
-										<th>Klien</th>
-                                        <th>Status</th>
+										<th>Status</th>
                                         <th>Teregistrasi</th>
+										<th>Klien</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -99,38 +114,35 @@
                                     <tr>
                                         <td><?php $no++; echo $no; ?></td>
                                         <td><?= $v['member_name'] ?><br><small>NIP: <?= $v['member_nip'] ?></small></td>
-                                        <td><?= $v['group_name'] ?></td>
-										<td><?= $v['nama_klien'] ?></td>
                                         <td>
+											<?
+											echo '<button '.$button_state.' class="btn btn-success btn-sm update_group" data-crm="'.$v['crm_id'].'" data-nama="'.$v['member_name'].'" data-group="'.$v['group_name'].'">'.$v['group_name'].'</button>';
+											?>
+										</td>
+										<td>
                                             <?php 
                                                 if($v['is_pk']=="" || $v['is_pk']=='0'){
-                                                    echo " <button class='btn btn-warning btn-sm doPK' data-ispk='".$v['cr_id']."-".$v['member_id']."-1'>peserta</button>";
+													echo " <button ".$button_state." class='btn btn-warning btn-sm doPK' data-ispk='".$v['cr_id']."-".$v['member_id']."-1'>Peserta</button>";
                                                 }else{
-                                                    echo " <button class='btn btn-success btn-sm doPK' data-ispk='".$v['cr_id']."-".$v['member_id']."-0'>PK</button>";
+													echo " <button ".$button_state." class='btn btn-success btn-sm doPK' data-ispk='".$v['cr_id']."-".$v['member_id']."-0'>PK</button>";
                                                 }
                                             ?>
                                            
                                         </td>
                                         <td class="text-center">
                                             <?php
-                                                 $mstat=memberstat($v['member_id'],$v['cr_id']);
+                                                $mstat=memberstat($v['member_id'],$v['cr_id']);
                                               
-                                                 if($mstat[0]->member_status > 0 ){
-                                                     $kode="batal-".$v['member_id']."-".$v['cr_id'];
-                                                     ?>
-                                                         <button class="btn btn-sm btn-rounded btn-success btact"  data-act='<?=$kode?>' >Ya</button>
-                                                     <?php
-                                                     
-                                                 }else{
-                                                     $kode="daftar-".$v['member_id']."-".$v['cr_id'];
-                                                     ?>
-                                                         <button class="btn btn-sm btn-rounded btn-danger btact" data-act='<?=$kode?>'>Batal</button>
-                                                     <?php
-                                                 }
-                                                 
-                                                 ?>
-                                            <!--<a title="Remove" href="<?= site_url('classroom/member_remove/'.$classroom['cr_id'].'/'.$v['crm_id']); ?>" class="btn text-danger <?= is_classroom_editable($classroom['cr_id'])?'':'d-none' ?>" onclick="return confirm('Anda yakin?')"><i class="fa fa-trash"></i></a>-->
+                                                if($mstat[0]->member_status > 0 ){
+													$kode="batal-".$v['member_id']."-".$v['cr_id'];
+													echo '<button '.$button_state.' class="btn btn-sm btn-rounded btn-success btact" data-act="'.$kode.'" >Ya</button>';
+                                                }else {
+													$kode="daftar-".$v['member_id']."-".$v['cr_id'];
+													echo '<button '.$button_state.' class="btn btn-sm btn-rounded btn-success btact" data-act="'.$kode.'" >Batal</button>';
+                                                }
+                                            ?>
                                         </td>
+										<td><?= $v['nama_klien'] ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <?php endif; ?>
@@ -179,9 +191,6 @@
                  <!-- PORTLET MEMBER GENERATOR --> 
                  <div class="kt-portlet">
                     <div class="kt-portlet__body">
-                        <div class="alert alert-danger" role="alert">
-                            <p>Fitur ini masih dalam tahap pengembangan</p>
-                        </div>
                             <h4>Member list Generator</h4>
                             <div class="alert alert-warning" role="alert">
                                 <ul style="list-style-type: none;">
@@ -193,10 +202,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="input">Salin daftar member dari excel anda</label>
-                                <textarea class="form-control" id="memberlist" name="memberlist" rows="8" placeholder="salin daftar member dari excel anda">
-
-                                </textarea>
-                                <button id="bgen" disabled class="btn btn-rounded btn-primary"> Generate !!</button>
+                                <textarea class="form-control" id="memberlist" name="memberlist" rows="8" placeholder="salin daftar member dari excel anda"></textarea>
+                                <button id="bgen" disabled class="mt-2 btn btn-rounded btn-primary"> Generate !!</button>
                             </div>      
                             <div class="p4 mb-4">
                                     <code>
@@ -213,6 +220,54 @@
         </div>
     </div>
 </div>
+
+<!--begin::Modal-->
+<div class="modal fade" id="modal_picker" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Update Data Group</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p class="text-center">
+					<?php
+					$durl = site_url('classroom/member_update_group');
+					$attributes = array('autocomplete'=>'off','method'=>'post', 'id' => 'dform');
+					echo form_open($durl, $attributes);
+					?>
+					<table class="table table-sm">
+						<tr>
+							<td>Nama Peserta</td>
+							<td id="mdl_nama_peserta"></td>
+						</tr>
+						<tr>
+							<td>Nama Group Saat Ini</td>
+							<td id="mdl_nama_group"></td>
+						</tr>
+						<tr>
+							<td>Nama Group</td>
+							<td>
+								<?php
+                                $attr = 'id="mdl_group_id" class="form-control" required';
+                                echo form_dropdown('mdl_group_id', $form_opt_group, '', $attr);
+                                ?>
+								
+								<input type="hidden" name="mdl_cr_id" value="<?=$classroom['cr_id']?>"/>
+								<input type="hidden" name="mdl_crm_id" id="mdl_crm_id" value=""/>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="text-right"><button type="submit" class="btn btn-success pl-5 pr-5">Simpan</button></td>
+						</tr>
+					</table>
+					<?php echo form_close(); ?>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end modal -->
 
 <script>
     "use strict";
@@ -275,6 +330,20 @@
 <script>
      $(document).ready(function() {
         var baseUrl='<?=base_url()?>';
+		
+		$("#kt_table").on("click",".update_group", function(e){
+			e.preventDefault();
+            var nama = $(this).data('nama');
+			var group = $(this).data('group');
+			var crm_id = $(this).data('crm');
+			
+			$("#mdl_nama_peserta").html(nama);
+			$("#mdl_nama_group").html(group);
+			$("#mdl_crm_id").val(crm_id);
+			$("#mdl_group_id").val("").change();
+			
+			$("#modal_picker").modal('show');
+		})
        
         $("#kt_table").on("click", ".doPK", function(e){
             e.preventDefault();

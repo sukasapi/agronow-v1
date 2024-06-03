@@ -151,6 +151,7 @@
                                         data-target="#classroomMemberPicker">Absensi Manual
                                 </button>
 
+                                <div id="menu" class="float-right ml-2"></div>
                                 <!--begin::Modal-->
                                 <div class="modal fade" id="classroomMemberPicker" tabindex="-1" role="dialog"
                                      aria-labelledby="classroomMemberPickerModalLabel" aria-hidden="true">
@@ -226,7 +227,7 @@
 
 
 
-
+<!--
 <script>
     "use strict";
     var KTDatatablesDataSourceAjaxServer = function() {
@@ -265,7 +266,26 @@
         KTDatatablesDataSourceAjaxServer.init();
     });
 </script>
+-->
 
+<script>
+    $(document).ready(function(){
+        $('#kt_table').DataTable({
+            dom: 'lBfrtip',
+            buttons: [
+                {
+                        extend:    'excel',
+                        text:      '<i class="fas fa-file-excel"></i>',
+                        titleAttr: 'Excel',
+                        className: 'btn btn-outline-success btn-sm',
+                        title: 'Absensi kelas '+'<?=strip_tags($page_sub_name)?>'
+                    },
+            ]
+        }).buttons().container().appendTo("#menu");
+    })
+
+
+</script>
 
 
 <script>

@@ -10,7 +10,7 @@ class Group_model extends CI_Model {
 
     /* DATATABLE BEGIN */
     var $table = '_group';
-    var $column_order = array('_group.group_id','_group.group_name','_group.group_code','_group.aghris_company_code','_klien.nama','count_member.total_member','_group.group_has_level','_group.group_portal','_group.group_status'); //set column field database for datatable orderable
+    var $column_order = array('_group.group_id','_group.group_name','_group.silsilah','_group.aghris_company_code','_klien.nama','count_member.total_member','_group.group_has_level','_group.group_portal','_group.group_status'); //set column field database for datatable orderable
     var $column_search = array('_group.group_name','_klien.nama'); //set column field database for datatable searchable
     var $order = array('id' => 'desc'); // default order
 
@@ -132,6 +132,13 @@ class Group_model extends CI_Model {
         if (!empty($param_query['filter_active'])) {
             $this->db->where('_group.group_status',$param_query['filter_active']);
         }
+		
+		if (!empty($param_query['silsilah'])) {
+			$this->db->group_start();
+			$this->db->where('_group.silsilah="'.$param_query['silsilah'].'"');
+			$this->db->or_where('_group.silsilah like "'.$param_query['silsilah'].'%"');
+			$this->db->group_end();
+        }
 
         if (isset($param_query['filter_klien'])) {
             $this->db->where('_group.id_klien',$param_query['filter_klien']);
@@ -235,4 +242,53 @@ class Group_model extends CI_Model {
 		
 		return @$data[0];
     }
+	
+	function get_silsilah($group_id) {
+		$group_id = (int) $group_id;
+		$sql = "SELECT silsilah FROM _group WHERE group_id='".$group_id."' ";
+		$query = $this->db->query($sql);
+		$data = $query->result_array();
+		
+		return @$data[0]['silsilah'];
+	}
+	
+	function get_company_by_silsilah($silsilah) {
+		$sql = "SELECT * FROM _group WHERE silsilah='".$silsilah."' ";
+		$query = $this->db->query($sql);
+		$data = $query->result_array();
+		
+		return @$data[0];
+	}
+	
+	function get_child_company($id_entitas,$mode) {
+		$addSql = "";
+		$id_entitas = (int) $id_entitas;
+		$session_group_id = $this->session->userdata('group_id');
+		
+		// super admin?
+		if(empty($session_group_id)) {
+			// do nothing
+		} else {
+			if($mode=="self") { // get data self
+				if($id_entitas!=$session_group_id) $addSql .= " 1=2 ";
+			} else if($mode=="self_child") { // get data self dan child lv 1
+				$silsilah = $this->get_silsilah($session_group_id);
+				if(empty($silsilah)) {
+					$addSql .= " 1=2 ";
+				} else {
+					$addSql .= " and (silsilah='".$silsilah."' or silsilah like '".$silsilah."%') ";
+				}
+			}
+		}
+		
+		if($id_entitas>0) {
+			$addSql .= " and group_id='".$id_entitas."' ";
+		}
+		
+		$sql = "select group_id, group_name, silsilah, id_klien from _group where group_status='active' ".$addSql." order by silsilah, group_name ";
+		$query = $this->db->query($sql);
+		$arrH = $query->result_array();
+		
+		return $arrH;
+	}
 }

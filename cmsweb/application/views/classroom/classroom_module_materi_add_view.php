@@ -88,6 +88,7 @@ $actual_link = urlencode($actual_link);
 
                                 <div id="media-holder">
                                     <label class="mt-3">Dokumen</label><input type="file" class="form-control" name="file" accept=".pdf" required />
+                                    <p><small>* Ukuran file maksimum 50 Mb </small></p>
                                 </div>
 
                                 <script>

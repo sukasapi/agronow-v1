@@ -106,6 +106,11 @@ $actual_link = urlencode($actual_link);
                 <!--begin::Portlet-->
                 <div class="kt-portlet">
                     <div class="kt-portlet__body">
+						
+						<div class="row" id="dload">
+							<img class="img-fluid" src="<?php echo base_url('assets/media/preloader/set2/64/Preloader_4.gif'); ?>"/>
+						</div>
+					
                         <!--begin: Datatable -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-sm nowraps" id="kt_table">
@@ -146,6 +151,8 @@ $actual_link = urlencode($actual_link);
 
 
 <script>
+	$('#dload').hide();
+	
     "use strict";
     var KTDatatablesDataSourceAjaxServer = function() {
 
@@ -154,6 +161,7 @@ $actual_link = urlencode($actual_link);
 
             // begin first table
             table.DataTable({
+				dom: 'Bftlpi',
                 scrollY: '50vh',
                 scrollX: true,
                 scrollCollapse: true,
@@ -169,8 +177,30 @@ $actual_link = urlencode($actual_link);
                 language: {
                     "infoFiltered": ""
                 },
+				aLengthMenu: [
+					[10, 25, 50, 100, -1],
+					[10, 25, 50, 100, "All"]
+				],
+				buttons: [
+					{
+						extend: 'excelHtml5',
+						header: true,
+						className: 'mt-1 ml-1 btn btn-success', 
+						text: 'Unduh File Excel', 
+						filename: 'data_member', 
+						exportOptions: { columns: ':visible' },
+						action: function(e, dt, node, config) {
+							var that = this;
+							$('#dload').show();
+							
+							setTimeout(function() {
+								$.fn.DataTable.ext.buttons.excelHtml5.action.call(that, e, dt, node, config);
+								$('#dload').hide();
+							}, 1000);
+						}
+					},
+				],
                 order: [[ 0, "desc" ]],
-
                 columns: [
                     {data: 'member_id'},
                     {data: 'member_name'},

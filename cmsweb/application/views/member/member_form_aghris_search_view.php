@@ -155,6 +155,8 @@
 										$group_id = aghris_group_id_by_code($v['company_code']);
 									}
 									
+									if(!empty($this->session->userdata('group_id')) && $this->session->userdata('group_id')!=$group_id) continue;
+									
 									if(empty($group_id) || $group_id=="34") continue;
 								?>
                                 <tr>

@@ -113,9 +113,12 @@ $actual_link = urlencode($actual_link);
 						<div class="bg-white rounded border border-info p-2">
 							<b>Informasi</b>:<br/>
 							<ul>
+								<!--
 								<li>Karyawan bisa memesan pelatihan tanggal <?=$arrKonfig['pengajuan_mulai'].' sd '.$arrKonfig['pengajuan_selesai']?> setiap bulannya.</li>
 								<li>Bagian SDM bisa menyetujui pelatihan tanggal <?=$arrKonfig['approval_mulai'].' sd '.$arrKonfig['approval_selesai']?> setiap bulannya.</li>
-								<li>Pelatihan yang muncul hanya pelatihan yang dipesan oleh karyawan.</li>
+								-->
+								<li>By default, data yang muncul hanya pelatihan dengan peminat setidaknya satu orang karyawan.</li>
+								<li>Untuk mengubah status penyelenggaraan pada pelatihan yg tidak ada pemesannya, gunakan opsi <b>tidak ada peserta</b></li>
 								<li>Status Lainnya: dibatalkan oleh karyawan, ditolak verifikator, tidak jadi diselenggarakan.</li>
 							</ul>
 						</div>
@@ -178,7 +181,7 @@ function unduh(format) {
 	
 $(document).ready(function(){
 	datatable = $('#dt').DataTable({
-		dom: 'tpli',
+		dom: 'Btpli',
 		searching : true,
 		filter: true,
 		scrollX: true,
@@ -188,9 +191,24 @@ $(document).ready(function(){
         ],
 		order: [[3, 'asc']],
 		buttons: [
-            { extend: 'csvHtml5', text: 'CSV (dotcomma)', title: 'evaluasi_lv3_av_dc', fieldBoundary: '', fieldSeparator: ';', exportOptions: { columns: ':visible' } },
-			{ extend: 'csvHtml5', text: 'CSV (comma)', title: 'evaluasi_lv3_av_c', fieldBoundary: '', fieldSeparator: ',', exportOptions: { columns: ':visible' } },
-        ],
+			{
+				extend: 'excelHtml5',
+				header: true,
+				className: 'mt-1 ml-1 btn btn-success', 
+				text: 'Unduh File Excel', 
+				filename: 'data_tracking_pelatihan', 
+				exportOptions: { columns: ':visible' },
+				action: function(e, dt, node, config) {
+					var that = this;
+					$('#dload').show();
+					
+					setTimeout(function() {
+						$.fn.DataTable.ext.buttons.excelHtml5.action.call(that, e, dt, node, config);
+						$('#dload').hide();
+					}, 1000);
+				}
+			},
+		],
 		data: [<?=$jsonDT?>],
         columns: [
 			{ data: 'no', title: 'No.', type: 'num' },

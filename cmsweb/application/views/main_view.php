@@ -761,31 +761,14 @@
 
                                     <?php if(has_access('classroom.view',FALSE)): ?>
                                     <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='classroom_soal'?'active':NULL; ?>" aria-haspopup="true">
-                                        <a href="<?php echo site_url('Report_classroom/test_result'); ?>" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
-                                            <span class="kt-menu__link-text">Nilai Kelas</span>
-                                        </a>
-                                    </li>
-                                    <?php endif; ?>
-                                    <?php if(has_access('classroom.view',FALSE)): ?>
-                                    <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='classroom_soal'?'active':NULL; ?>" aria-haspopup="true">
                                         <a href="<?php echo site_url('classroom/test_result'); ?>" class="kt-menu__link ">
                                             <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
                                             <span class="kt-menu__link-text">Laporan Kelas</span>
                                         </a>
                                     </li>
                                     <?php endif; ?>
-                                    <!-- TRACKING WHISLIST -->
-                                     <!-- KDW 3004024 -->
-                                    <?php if(has_access('classroom.view',FALSE)): ?>
-                                    <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='classroom_soal'?'active':NULL; ?>" aria-haspopup="true">
-                                        <a href="<?php echo site_url('laporan_tracking_whislist'); ?>" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
-                                            <span class="kt-menu__link-text">Tracking Whistlist</span>
-                                        </a>
-                                    </li>
-                                    <?php endif; ?> 
-                                    <!--- NPS -->
+                                     
+                                         <!--- NPS -->
                                     <!-- KDW 30012024 -->
                                     <!--- 1. Bank Soal -->
                                     <!--- 2. Report -->
@@ -971,14 +954,14 @@
                                         </span>
                                     </li>
 									
-									<?php if(has_access('learningwallet.konfig_approval',FALSE)): ?>
+									<?php /* if(has_access('learningwallet.konfig_approval',FALSE)): ?>
 									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet'?'active':NULL; ?>" aria-haspopup="true">
                                         <a href="<?php echo site_url('learning_wallet/approval'); ?>" class="kt-menu__link ">
                                             <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
                                             <span class="kt-menu__link-text">Konfigurasi Approval</span>
                                         </a>
                                     </li>
-									<?php endif; ?>
+									<?php endif; */ ?>
 									
 									<?php if(has_access('learningwallet.pelatihan_view',FALSE)): ?>
 									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet'?'active':NULL; ?>" aria-haspopup="true">
@@ -1007,28 +990,147 @@
                                     </li>
 									<?php endif; ?>
 									
-									<?php if(has_access('learningwallet.dashboard',FALSE)): ?>
-                                    <li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet'?'active':NULL; ?>" aria-haspopup="true">
-                                        <a href="<?php echo site_url('learning_wallet/saldo_view'); ?>" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
-                                            <span class="kt-menu__link-text">Saldo Peserta</span>
-                                        </a>
-                                    </li>
-									<?php endif; ?>
-									
-									<?php if(has_access('learningwallet.dashboard',FALSE)): ?>
+									<?php /* if(has_access('learningwallet.dashboard',FALSE)): ?>
 									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet'?'active':NULL; ?>" aria-haspopup="true">
                                         <a href="<?php echo site_url('learning_wallet/dashboard_utama'); ?>" class="kt-menu__link ">
                                             <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
                                             <span class="kt-menu__link-text">Dashboard Utama</span>
                                         </a>
                                     </li>
+									<?php endif; */ ?>
+									
+									<?php if(has_access('learningwallet.monitoring_pelatihan',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet/monitoring'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Monitoring Data Pelatihan</span>
+                                        </a>
+                                    </li>
 									<?php endif; ?>
-
                                 </ul>
 
                             </div>
 
+                        </li>
+						<?php endif; ?>
+						
+						<!-- Learning Wallet Entitas -->
+                        <?php if(has_access('parentmenu.learningwalletentitas',FALSE)): ?>
+                        <li class="kt-menu__item <?php echo (($this->uri->segment(1)=='learning_wallet_entitas'))?'kt-menu__item--open':NULL; ?> kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
+
+                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                                <span class="kt-menu__link-icon"><i class="fa-solid fa-wallet"></i></span>
+                                <span class="kt-menu__link-text">Learning Wallet Entitas</span>
+                                <i class="kt-menu__ver-arrow la la-angle-right"></i>
+                            </a>
+
+                            <!--Submenu-->
+                            <div class="kt-menu__submenu " kt-hidden-height="80" style=""><span class="kt-menu__arrow"></span>
+
+                                <ul class="kt-menu__subnav">
+                                    <li class="kt-menu__item kt-menu__item--parent" aria-haspopup="true">
+                                        <span class="kt-menu__link">
+                                            <span class="kt-menu__link-text">Learning Wallet Entitas</span>
+                                        </span>
+                                    </li>
+									
+									<?php if(has_access('learningwalletentitas.kelola_dana',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/kelola_dana'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Kelola Dana Pengembangan per Level Karyawan</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.approval',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/approval'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Approval Pengajuan Pelatihan</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.approval_massal',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/approval_massal'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Pendaftaran Pelatihan Massal</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.wishlist',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/wishlist'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Wishlist by Pelatihan</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.wishlist',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/wishlist_peminat'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Wishlist by Peminat</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.wishlist',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('laporan_tracking_whislist'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Tracking Wishlist</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.dashboard_penyelenggaraan',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/dashboard_penyelenggaraan'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Dashboard Penyelenggaraan Pelatihan yang Diajukan</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.rekap_realisasi',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/rekap_realisasi'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Rekap Penggunaan AgroWallet</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+									<?php if(has_access('learningwalletentitas.dashboard_realisasi',FALSE)): ?>
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/dashboard_ringkasan'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Ringkasan Penggunaan AgroWallet (Karyawan)</span>
+                                        </a>
+                                    </li>
+									
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/dashboard_ringkasan_entitas'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Ringkasan Penggunaan AgroWallet (Entitas)</span>
+                                        </a>
+                                    </li>
+									
+									<li class="kt-menu__item kt-menu__item--<?php echo $this->uri->segment(1)=='learning_wallet_entitas'?'active':NULL; ?>" aria-haspopup="true">
+                                        <a href="<?php echo site_url('learning_wallet_entitas/dashboard_rincian_realisasi'); ?>" class="kt-menu__link ">
+                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                            <span class="kt-menu__link-text">Rincian Realisasi AgroWallet</span>
+                                        </a>
+                                    </li>
+									<?php endif; ?>
+									
+                                </ul>
+                            </div>
                         </li>
 						<?php endif; ?>
 						
@@ -1541,6 +1643,9 @@
 </div>
 
 <!-- end::Scrolltop -->
+
+
+
 
 <!-- begin::Global Config(global config for global JS sciprts) -->
 <script>

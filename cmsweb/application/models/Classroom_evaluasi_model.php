@@ -261,6 +261,22 @@ class Classroom_evaluasi_model extends CI_Model {
         }
     }
 
+    function get_jawabdetail($filter=null){
+        $this->db->select('*,m.member_name as nama_peserta,g.group_name as entitas,nss.pengajar as narsum')
+                 ->from('_nps_jawab as nj')
+                 ->join('_nps_set_soal as nss','nss.id=nj.set_id')
+                 ->join('_member as m','m.member_id=nj.member_id','left')
+                 ->join('_group as g','g.group_id=m.group_id','left')
+                 ->where($filter);
+        $exe=$this->db->get()->result();
+        $sql=$this->db->last_query();
+        if(count((array)$exe)>0){
+            return $exe;
+        }else{
+            return array();
+        }
+    }
+
     function add_evaluasi($data=null){
         $dinput=array();
         $res=0;
@@ -370,11 +386,14 @@ class Classroom_evaluasi_model extends CI_Model {
                  ->from('_nps_set_soal')
                  ->where($filter);
         $exe=$this->db->get()->result();
-        if(count((array)$exe) > 0){
+        $syn=$this->db->last_query();
+        //return $syn;
+       if(count((array)$exe) > 0){
+            
             return $exe;
         }else{
             return array();
-        }
+        }/**/
     }
 
     function add_setsoal($data=null){
@@ -408,7 +427,7 @@ class Classroom_evaluasi_model extends CI_Model {
     }
 
     function edit_setsoal($data=null){
-        $cr_id=$data['cr_id'];
+        $cr_id=$data['cr_id']; 
         $result="0";
         $pengajar=isset($data['pengajar']) && $data['pengajar']!=""?$data['pengajar']:"";
         $setsoal=isset($data['setsoal']) && $data['setsoal']!=""?$data['setsoal']:"-";

@@ -56,7 +56,7 @@ class Learning_wallet extends CI_Controller {
         echo $response_json;
     }
 	
-	function l_ajax_dana(){
+	/* function l_ajax_dana(){
         if (!$this->input->is_ajax_request()) {
             exit('No direct script access allowed');
         }
@@ -133,7 +133,7 @@ class Learning_wallet extends CI_Controller {
 			}
             
 			$data[] = $row;
-        } */
+        } *-/
 		
 		$recordsTotal = 2;
 		$recordsFiltered = 2;
@@ -247,7 +247,7 @@ class Learning_wallet extends CI_Controller {
 			}
             
 			$data[] = $row;
-        } */
+        } *-/
 		
 		$recordsTotal = 2;
 		$recordsFiltered = 2;
@@ -278,7 +278,7 @@ class Learning_wallet extends CI_Controller {
 		
 		//output to json format
         echo json_encode($output);
-    }
+    } */
 	
 	function l_ajax_konfig_group($tahun=NULL,$group_id=NULL){
         if (!$this->input->is_ajax_request()) {
@@ -444,9 +444,13 @@ class Learning_wallet extends CI_Controller {
             $row['id']           = $item->id;
             $row['kode']         = $item->kode;
             $row['nama']          = $item->nama;
+			$row['harga']          = $item->harga;
 			$row['tgl_mulai']     = $item->tgl_mulai;
 			$row['tgl_selesai']   = $item->tgl_selesai;
 			$row['status']        = $item->status;
+			//30052024
+			$row['level']        = $item->daftar_level_karyawan;
+			$row['jam']          = $item->jumlah_jam;
 
             $data[] = $row;
         }
@@ -466,7 +470,6 @@ class Learning_wallet extends CI_Controller {
 	}
 
     function pelatihan(){
-
         has_access('learningwallet.pelatihan_view');
 
         $data['section_id']     = $this->section_id;
@@ -478,7 +481,6 @@ class Learning_wallet extends CI_Controller {
     }
 	
 	function usulan_pelatihan(){
-
         has_access('learningwallet.usulan_view');
 
         $data['section_id']     = $this->section_id;
@@ -911,6 +913,9 @@ class Learning_wallet extends CI_Controller {
 		exit;
 	} */
 	
+	/*
+	 ** sudah ga dipake
+	 **
 	function dashboard_utama() {
 		has_access('learningwallet.dashboard');
 		
@@ -1234,7 +1239,7 @@ class Learning_wallet extends CI_Controller {
 				"juml_minimal": "'.$val['minimal_peserta'].'",
 				"juml_approve": "'.$val['juml_approve'].'",
 				"juml_waiting": "'.$val['juml_waiting'].'",
-				}, '; */
+				}, '; *-/
 		}
 		
 		$sql = "select group_id, group_name from _group where id_klien='1' order by length(group_name), group_name ";
@@ -1275,6 +1280,7 @@ class Learning_wallet extends CI_Controller {
 		$data['page'] = 'learning_wallet/learning_wallet_dashboard_pengajuan_view';
         $this->load->view('main_view',$data);
 	}
+	*/
 	
 	function tracking_penyelenggaraan() {
 		has_access('learningwallet.tracking_penyelenggaraan_view');
@@ -1295,6 +1301,7 @@ class Learning_wallet extends CI_Controller {
 		
 		// status penyelenggaraan
 		$arrSP = $this->learning_wallet_model->status_penyelenggaraan();
+		$arrSP['zero_peserta'] = 'tidak ada peserta';
 		
 		// arr konfig untuk informasi
 		$arrKonfig = array();
@@ -1311,7 +1318,7 @@ class Learning_wallet extends CI_Controller {
 		
 		$post = $this->input->post();
 		if(!empty($post)) {
-			$kode = $post['kode'];
+			$kode = trim($post['kode']);
 			$bulan = (int) $post['bulan'];
 			$tahun = (int) $post['tahun'];
 			$sp = $post['sp'];
@@ -1331,11 +1338,17 @@ class Learning_wallet extends CI_Controller {
 		$tb = $tahun.$dbulan;
 		
 		$addSql = "";
+		$addSql2= "";
 		if(!empty($kode)) {
 			$addSql .= " and c.kode like '%".$kode."%' ";
 		}
 		if(!empty($sp)) {
-			$addSql .= " and c.status_penyelenggaraan='".$sp."' ";
+			if($sp=="zero_peserta") {
+				$addSql2 .= " and p.id_lw_classroom is null ";
+			} else {
+				$addSql .= " and c.status_penyelenggaraan='".$sp."' ";
+				$addSql2 .= " and p.status='aktif' ";
+			}
 		}
 		if($kategori=="pengajuan") {
 			$addSql .= " and p.tgl_request like '".$tb."-%' ";
@@ -1353,8 +1366,8 @@ class Learning_wallet extends CI_Controller {
 				sum(if(p.is_final_sdm='1' and p.kode_status_current not in ('40'), 1, 0)) as juml_disapprove, 
 				sum(if(p.is_final_sdm='0',1,0)) as juml_waiting,
 				group_concat(if(p.is_final_sdm='0', p.id_group, NULL)) as list_group
-			 from _learning_wallet_classroom c, _learning_wallet_pengajuan p
-			 where c.id=p.id_lw_classroom and c.status='aktif' and p.status='aktif' ".$addSql."
+			 from _learning_wallet_classroom c left join _learning_wallet_pengajuan p on c.id=p.id_lw_classroom
+			 where c.status='aktif' ".$addSql." ".$addSql2."
 			 group by c.id
 			 order by c.tgl_mulai, c.nama ";
 		$res = $this->db->query($sql);
@@ -1473,18 +1486,16 @@ class Learning_wallet extends CI_Controller {
 		$jumlah_disetujui = 0;
 		$jumlah_menunggu = 0;
 		$sql =
-			"select g.group_name, m.member_id, m.member_name, m.member_nip, p.kode_status_current, p.id as id_pengajuan, p.is_final_sdm,p.no_wa
+			"select 
+				g.group_name, 
+				m.member_id, m.member_name, m.member_nip, m.member_phone as no_wa,
+				p.kode_status_current, p.id as id_pengajuan, p.is_final_sdm
 			 from _learning_wallet_pengajuan p, _member m, _group g
 			 where p.id_member=m.member_id and m.group_id=g.group_id and p.id_lw_classroom='".$id_kelas."' and p.tahun='".$tahun."' and p.status='aktif'
 			 order by length(g.group_name), g.group_name";
 		$res = $this->db->query($sql);
 		$row = $res->result_array();
 		foreach($row as $key => $val) {
-			if($val['is_final_sdm']=="0") {
-				$jumlah_menunggu++;
-			} else {
-				if($val['kode_status_current']=="40") $jumlah_disetujui++;
-			}
 			//get no wa
 			if(isset($val['no_wa']) || $val['no_wa'] !='' ){
 				$no_wa = $val['no_wa'];
@@ -1494,7 +1505,9 @@ class Learning_wallet extends CI_Controller {
 			
 			// munculkan form update approval?
 			$dForm = '';
-			if($val['is_final_sdm']=="0") {
+			if($val['is_final_sdm']=="0" || $val['kode_status_current']=="-40") {
+				$jumlah_menunggu++;
+				
 				$dForm =
 					'<select class="form-control kt-input" name="sp['.$val['id_pengajuan'].']">
 						<option value="0"></option>
@@ -1502,6 +1515,10 @@ class Learning_wallet extends CI_Controller {
 						<option value="-20">'.$arrStatusPengajuan['-20']['label'].'</option>
 					 </select>
 					 <input type="hidden" name="nama['.$val['id_pengajuan'].']" value="'.$val['member_name'].'"/>';
+				
+				if($val['kode_status_current']=="-40") {
+					$val['group_name'] .= '<div style="color:'.$arrStatusPengajuan[$val['kode_status_current']]['warna'].'">'.$arrStatusPengajuan[$val['kode_status_current']]['label'].'</div>';
+				}
 				
 				$i1++;
 				$peserta_ui .=
@@ -1518,6 +1535,7 @@ class Learning_wallet extends CI_Controller {
 			} else {
 				if($val['kode_status_current']=="40") {
 					$i2++;
+					$jumlah_disetujui++;
 					
 					$aksiUI =  '<a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="batal('.$val['id_pengajuan'].',\''.$val['member_nip'].'\')">batalkan</a>&nbsp;';
 					// ganti peserta di-takedown
@@ -1558,12 +1576,12 @@ class Learning_wallet extends CI_Controller {
 		}
 		
 		$btn_simpan = '<button type="button" class="btn btn-success pl-5 pr-5" onclick="konfirm(\'form_sp\')">Simpan</button>';
-		if($jumlah_menunggu>0) {
+		/* if($jumlah_menunggu>0) {
 			// do nothing
 			// $btn_simpan = '<div class="text-danger">tombol simpan tidak muncul karena ada '.$jumlah_menunggu.' karyawan yang statusnya masih menunggu persetujuan.</div>';
 		} else {
-			if($data_kelas['status_penyelenggaraan']!="-") $btn_simpan = "&nbsp;";
-		}
+			// if($data_kelas['status_penyelenggaraan']!="-") $btn_simpan = "&nbsp;";
+		} */
 		
 		$data['request']['sp'] = $data_kelas['status_penyelenggaraan'];
 		$data['request']['catatan'] = $data_kelas['catatan_penyelenggaraan'];
@@ -1810,8 +1828,8 @@ class Learning_wallet extends CI_Controller {
         $this->load->view('main_view',$data);
 	}
 	
-	/* function monitoring() {
-		// has_access('learningwallet.dashboard');
+	function monitoring() {
+		has_access('learningwallet.monitoring_pelatihan');
 		
 		$get = $this->input->get();
 		$data['tahun_terpilih'] = (int) $get['tahun'];
@@ -1827,10 +1845,10 @@ class Learning_wallet extends CI_Controller {
 		}
 		
 		$data['page_name']          = 'Learning Wallet';
-        $data['page_sub_name']      = 'Monitoring Data Pelatihan ';
+        $data['page_sub_name']      = 'Monitoring Data Pelatihan';
 		$data['page'] = 'learning_wallet/learning_wallet_monitoring_view';
         $this->load->view('main_view',$data);
-	} */
+	}
 	
 	//author 	: KDW
 	//date 		: 12.05.2023
@@ -1838,6 +1856,7 @@ class Learning_wallet extends CI_Controller {
 
 	function tambah_kelas_agrowallet(){
 		has_access('learningwallet.tambah_kelas_agrowallet');
+		
 		$data['page_name']          = 'Learning Wallet';
         $data['page_sub_name']      = 'Pendaftaran Kelas Agrowallet ';
 		$data['page'] = 'learning_wallet/learning_wallet_form_add';
@@ -1848,42 +1867,58 @@ class Learning_wallet extends CI_Controller {
 		$data['sekolah']=$this->learning_wallet_model->get_sekolah();
 		//data penyelenggara : sementara set 1
 		$data['penyelenggara']=$this->learning_wallet_model->get_penyelenggara();
-		$data['metode']=array("online","offline","blended offline","blended online");
-		$data['kategori']=array("ecowebinar","ecolearning","reguler");
-
+		$data['metode']=array("online","offline","blended online","blended offline");
+  		
+		$kelas_berkas_ui = '';
+		$data['kategori']=array();
+		for($i=1;$i<=12;$i++) {
+			$aset = "asset_".$i.".jpg";
+			$data['kategori'][$aset] = $aset;
+			$kelas_berkas_ui .=
+				'<figure class="col-6">
+					<img src="'.URL_BASE.'media/image_agrowallet/'.$aset.'" class="img-thumbnail">
+					<figcaption>'.$aset.'</figcaption>
+				 </figure>';
+		}
+		$data['kelas_berkas_ui'] = $kelas_berkas_ui;
+		
         $this->load->view('main_view',$data);
 	}
-
+	
+	// do tambah data by ajax
 	function add_kelas(){
-		//has_access('learningwallet.tambah_kelas_agrowallet');
-		$id_penyelenggara=$_POST['penyelenggara'];
-		$id_klien=$_POST['klien'];
-		$tahun=$_POST['tahun'];
-		$id_sekolah=$_POST['sekolah'];
-		$kode=$_POST['kodekelas'];;
-		$nama=$_POST['namakelas'];
-		$metode=$_POST['metode'];
-		$durasi_hari=$_POST['hari'];
-		$jumlah_jam=$_POST['jam'];
-		$daftar_level_karyawan=$_POST['level'];
-		$catatan_level_peserta=$_POST['catatanlevel'];
-		$tgl_mulai=date('Y-m-d',strtotime($_POST['mulai']));
-		$tgl_selesai=date('Y-m-d',strtotime($_POST['selesai']));
-		$harga=$_POST['harga'];
-		$minimal_peserta=$_POST['minimal'];
-		$lokasi_offline=$_POST['lokasi'];
-		$keterangan=$_POST['keterangan'];
-		$deskripsi=$_POST['deskripsi'];
-		$silabus=$_POST['silabus'];
-		$sasaran_pembelajaran=$_POST['sasaran'];
-		$kata_kunci=$_POST['tag'];
+		has_access('learningwallet.tambah_kelas_agrowallet');
+		
+		$id_penyelenggara=$this->input->post('penyelenggara', true);
+		$id_klien=$this->input->post('klien', true);
+		$tahun=$this->input->post('tahun', true);
+		$id_sekolah=$this->input->post('sekolah', true);
+		$kode=$this->input->post('kodekelas', true);
+		$nama=$this->input->post('namakelas', true);
+		$metode=$this->input->post('metode', true);
+		$durasi_hari=$this->input->post('hari', true);
+		$jumlah_jam=$this->input->post('jam', true);
+		$daftar_level_karyawan=$this->input->post('level', true);
+		$catatan_level_peserta=$this->input->post('catatanlevel', true);
+		$tgl_mulai=date('Y-m-d',strtotime($this->input->post('mulai', true)));
+		$tgl_selesai=date('Y-m-d',strtotime($this->input->post('selesai', true)));
+		$harga=$this->input->post('harga', true);
+		$minimal_peserta=$this->input->post('minimal', true);
+		$lokasi_offline=$this->input->post('lokasi', true);
+		$keterangan=$this->input->post('keterangan', true);
+		$deskripsi=$this->input->post('deskripsi', true);
+		$silabus=$this->input->post('silabus', true);
+		$sasaran_pembelajaran=$this->input->post('sasaran', true);
+		$kata_kunci=$this->input->post('tag', true);
 		$status="aktif";
-		$is_ecolearning=isset($_POST['eco']);
+		$eco = $this->input->post('eco', true);
+		$is_ecolearning=(!empty($eco))? '1' : '0';
 		$status_penyelengaraan="-";
-		$catatan_penyelenggaraan=$_POST['caper'];
-		$pic=$_POST['pic'];
+		$catatan_penyelenggaraan=$this->input->post('caper', true);
+		$pic=$this->input->post('pic', true);
 		$add_by=$_SESSION['id'];
-		switch($_POST['kategori']){
+		$berkas = $this->input->post('kategori', true);
+		/* switch($_POST['kategori']){
 			case 'ecowebinar':
 				$berkas="ecowebinar.png";
 			break;
@@ -1896,9 +1931,8 @@ class Learning_wallet extends CI_Controller {
 			default:
 				$berkas="default.png";
 			break;
-		}
-		//$pic=$_POST['pic'];
-
+		} */
+		
 		$datapost=array(
 			"id_penyelenggara"=>$id_penyelenggara,
 			"id_klien"=>$id_klien,
@@ -1942,6 +1976,10 @@ class Learning_wallet extends CI_Controller {
 				"status"=>"ok",
 				"data"=>$idbaru,
 				"pesan"=>"kelas telah dibuat");
+			
+			// log
+			create_log($this->section_id,0,'tambah pelatihan agrowallet','');
+			
 			//// non aktif, sistem ganti tidka ada upload lagi 10.10.2023
 			/*$upcover=$this->learning_wallet_model->upload_cover($_FILES,$idbaru);
 			if($upcover =="ok"){
@@ -1961,6 +1999,9 @@ class Learning_wallet extends CI_Controller {
 				"status"=>"gagal",
 				"data"=>$idbaru,
 				"pesan"=>"kelas gagal dibuat");
+				
+			// log
+			create_log($this->section_id,0,'gagal tambah pelatihan agrowallet','');
 		}/**/
 		// upload file 
 
@@ -2069,6 +2110,8 @@ class Learning_wallet extends CI_Controller {
 	//function  : editkelas kelas agrowallet
 
 	function edit_kelas_agrowallet(){
+		has_access('learningwallet.edit_kelas_agrowallet');
+		
 		$kelas_id=$this->uri->segment(3);
 		if(isset($kelas_id) || $kelas_id!=""){
 			$param=array("lwc.id"=>$kelas_id);
@@ -2079,7 +2122,7 @@ class Learning_wallet extends CI_Controller {
 
 			echo "kembali ke menu list pelatihan";
 		}
-		
+		 
 	
 		$data['page_name']          = 'Learning Wallet';
         $data['page_sub_name']      = 'Pendaftaran Kelas Agrowallet ';
@@ -2090,7 +2133,9 @@ class Learning_wallet extends CI_Controller {
 		// data sekolah
 		$data['sekolah']=$this->learning_wallet_model->get_sekolah();
 		//data metode : sementara isi 1
-		$data['metode']=array("online","offline","blended offline","blended online");
+		$data['metode']=array("online","offline","blended online","blended offline");
+		//data penyelenggaraan
+		$data['status_kelas']=array("aktif","dihapus");
 		//data penyelenggaraan
 		$data['status_penyelenggaraan']=array("-","jalan","batal");
 		//data penyelenggara : sementara set 1
@@ -2098,21 +2143,34 @@ class Learning_wallet extends CI_Controller {
 		// data kelas 
 		$data['kelas']=$datakelas;
 		//data kategori kelas
-		$data['kategori']=array("ecowebinar","ecolearning","reguler");
-		//data status
-		$data['status']=array("aktif","dihapus");
+		$kelas_berkas_ui = '';
+		$data['kategori']=array();
+		for($i=1;$i<=12;$i++) {
+			$aset = "asset_".$i.".jpg";
+			$data['kategori'][$aset] = $aset;
+			$kelas_berkas_ui .=
+				'<figure class="col-6">
+					<img src="'.URL_BASE.'media/image_agrowallet/'.$aset.'" class="img-thumbnail">
+					<figcaption>'.$aset.'</figcaption>
+				 </figure>';
+		}
+		$data['kelas_berkas_ui'] = $kelas_berkas_ui;
+		
         $this->load->view('main_view',$data);
 	}
 
+	// do edit data by ajax
 	function edit_kelas(){
-		//has_access('learningwallet.tambah_kelas_agrowallet');
-		$idkelas=$_POST['kelas'];
-		$id_penyelenggara=$_POST['penyelenggara'];
-		$id_klien=$_POST['klien'];
-		$tahun=$_POST['tahun'];
-		$id_sekolah=$_POST['sekolah'];
-		$kode=$_POST['kodekelas'];;
-		switch($_POST['kategori']){
+		has_access('learningwallet.edit_kelas_agrowallet');
+		
+		$idkelas=$this->input->post('kelas', true);
+		$id_penyelenggara=$this->input->post('penyelenggara', true);
+		$id_klien=$this->input->post('klien', true);
+		$tahun=$this->input->post('tahun', true);
+		$id_sekolah=$this->input->post('sekolah', true);
+		$kode=$this->input->post('kodekelas', true);
+		$berkas = $this->input->post('kategori', true);
+		/* switch($_POST['kategori']){
 			case 'ecowebinar':
 				$berkas="ecowebinar.png";
 			break;
@@ -2125,29 +2183,30 @@ class Learning_wallet extends CI_Controller {
 			default:
 				$berkas="default.png";
 			break;
-		}
-		$nama=$_POST['namakelas'];
-		$metode=$_POST['metode'];
-		$durasi_hari=$_POST['hari'];
-		$jumlah_jam=$_POST['jam'];
-		$daftar_level_karyawan=$_POST['level'];
-		$catatan_level_peserta=$_POST['catatanlevel'];
-		$tgl_mulai=date('Y-m-d',strtotime($_POST['mulai']));
-		$tgl_selesai=date('Y-m-d',strtotime($_POST['selesai']));
-		$harga=$_POST['harga'];
-		$minimal_peserta=$_POST['minimal'];
-		$lokasi_offline=$_POST['lokasi'];
-		$keterangan=$_POST['keterangan'];
-		$deskripsi=$_POST['deskripsi'];
-		$silabus=$_POST['silabus'];
-		$sasaran_pembelajaran=$_POST['sasaran'];
-		$kata_kunci=$_POST['tag'];
-		$status="aktif";
-		$is_ecolearning=isset($_POST['eco']);
-		//$status_penyelengaraan=$_POST['status_penyelenggaraan'];
-		$catatan_penyelenggaraan=$_POST['caper'];
-		$pic=$_POST['pic'];
-		$status=isset($_POST['status'])&&$_POST['status']=="aktif"?"aktif":"dihapus";
+		} */
+		$nama=$this->input->post('namakelas', true);
+		$metode=$this->input->post('metode', true);
+		$durasi_hari=$this->input->post('hari', true);
+		$jumlah_jam=$this->input->post('jam', true);
+		$daftar_level_karyawan=$this->input->post('level', true);
+		$catatan_level_peserta=$this->input->post('catatanlevel', true);
+		$tgl_mulai=date('Y-m-d',strtotime($this->input->post('mulai', true)));
+		$tgl_selesai=date('Y-m-d',strtotime($this->input->post('selesai', true)));
+		$harga=$this->input->post('harga', true);
+		$minimal_peserta=$this->input->post('minimal', true);
+		$lokasi_offline=$this->input->post('lokasi', true);
+		$keterangan=$this->input->post('keterangan', true);
+		$deskripsi=$this->input->post('deskripsi', true);
+		$silabus=$this->input->post('silabus', true);
+		$sasaran_pembelajaran=$this->input->post('sasaran', true);
+		$kata_kunci=$this->input->post('tag', true);
+		$status=$this->input->post('status', true);
+		$status_penyelenggaraan=$this->input->post('status_penyelenggaraan', true);;
+		$eco = $this->input->post('eco', true);
+		$is_ecolearning=(!empty($eco))? '1' : '0';
+		$catatan_penyelenggaraan=$this->input->post('caper', true);
+		$pic=$this->input->post('pic', true);
+		
 
 		$datapost=array(
 			"id_penyelenggara"=>$id_penyelenggara,
@@ -2171,13 +2230,13 @@ class Learning_wallet extends CI_Controller {
 			"deskripsi"=>$deskripsi,
 			"silabus"=>$silabus,
 			"sasaran_pembelajaran"=>$sasaran_pembelajaran,
+			"status"=>$status,
+			"status_penyelenggaraan"=>$status_penyelenggaraan,
 			"kata_kunci"=>$kata_kunci,
 			"status"=>$status,
 			"is_ecolearning"=>$is_ecolearning,
 			"catatan_penyelenggaraan"=>$catatan_penyelenggaraan,
-			"pic"=>$pic,
-			"status"=>$status
-			
+			"pic"=>$pic
 		);
 		// edit data kelas
 		$where=array("id"=>$idkelas);
@@ -2190,7 +2249,7 @@ class Learning_wallet extends CI_Controller {
 			$result=array(
 				"status"=>"ok",
 				"data"=>$idedit,
-				"pesan"=>"kelas telah dibuat");
+				"pesan"=>"kelas telah dimutakhirkan");
 			/*$upcover=$this->learning_wallet_model->upload_cover($_FILES,$idedit);
 			if($upcover =="ok"){
 				$result=array(
@@ -2204,11 +2263,17 @@ class Learning_wallet extends CI_Controller {
 					"pesan"=>"Cover tidak terupdate");
 			}*/
 			
+			// log
+			create_log($this->section_id,0,'update pelatihan agrowallet','');
+			
 		}else{
 			$result=array(
 				"status"=>"gagal",
 				"data"=>$idedit,
-				"pesan"=>"kelas gagal dibuat");
+				"pesan"=>"kelas gagal dimutakhirkan");
+				
+			// log
+			create_log($this->section_id,0,'gagal update pelatihan agrowallet','');
 		}
 		// upload file 
 
@@ -2222,7 +2287,7 @@ class Learning_wallet extends CI_Controller {
 	//date 		: 25.05.2023
 	//function  : Saldo Agrowallet
 
-	function saldo_view(){
+	/* function saldo_view(){
 		$data['page_name']          = 'Learning Wallet';
         $data['page_sub_name']      = 'Saldo Peserta Kelas';
 
@@ -2246,7 +2311,7 @@ class Learning_wallet extends CI_Controller {
 							"modal"=>$modal,
 							"pengajuan"=>$pengajuan);
 							
-		}*/
+		}*-/
 		$datamember=$this->learning_wallet_model->getmember();
 		foreach($datamember as $m){
 			$idm=$m['member_id'];
@@ -2276,13 +2341,13 @@ class Learning_wallet extends CI_Controller {
 		$data['saldo']=$saldo;
 		$data['page'] = 'learning_wallet/learning_wallet_saldo';
 		$this->load->view('main_view',$data);
-	}
+	} */
 
 	//author 	: KDW
 	//date 		: 06.06.2023
 	//function  : testing query
 
-	function tesq(){
+	/* function tesq(){
 		$datamember=$this->learning_wallet_model->getmember();
 		foreach($datamember as $m){
 			$idm=$m['member_id'];
@@ -2308,6 +2373,5 @@ class Learning_wallet extends CI_Controller {
 				"pengajuan"=>$pengajuan);
 			
 		}	
-
-	}
+	} */
 }

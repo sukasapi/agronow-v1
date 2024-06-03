@@ -1,19 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Category_model extends CI_Model {
-
+ 
     public function __construct(){
         parent::__construct(); //inherit dari cat_parent
         $this->load->database();
     }
 
-
-
     function get_all($keyword=NULL,$limit=NULL,$offset=NULL,$param_query=NULL){
         $this->db->select('SQL_CALC_FOUND_ROWS _category.*,cat_parent.cat_name as cat_parent_name',FALSE);
         $this->db->from('_category');
-
-
         $this->db->join('_category as cat_parent','_category.cat_parent=cat_parent.cat_id','LEFT');
 
 

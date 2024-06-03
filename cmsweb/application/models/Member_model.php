@@ -18,7 +18,6 @@ class Member_model extends CI_Model {
     {
 
         //add custom filter here
-
         if($this->input->get('group_ids')){
             $this->db->where_in('_member.group_id',$this->input->get('group_ids'));
         }else{

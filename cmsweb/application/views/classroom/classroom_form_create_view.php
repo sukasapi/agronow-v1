@@ -33,7 +33,6 @@
             ?>
 
             <div class="col-lg-7">
-
                 <!-- START PORTLET CONTENT -->
                 <div class="kt-portlet kt-portlet--head-sm" data-ktportlet="true">
                     <div class="kt-portlet__head">
@@ -59,7 +58,7 @@
                                     <option value=""></option>
 									<option value="dalam_app">dikelola di dalam AgroNow (AgroWallet dan Non AgroWallet)</option>
 									<option value="lms_ext_agrowallet">dikelola di luar AgroNow (AgroWallet)</option>
-									<option value="luar_app">dikelola di luar AgroNow (100% peserta Dari Luar PTPN Group)</option>
+									<option value="luar_app">dikelola di luar AgroNow (100% peserta dari Luar PTPN Group)</option>
                                 </select>
 							</div>
 							
@@ -241,7 +240,7 @@
                                 <div class="kt-radio-inline">
                                     <label class="kt-radio kt-radio--solid">
                                         <input type="radio" name="cr_modul_harus_urut" required value="1" <?php
-                                        echo set_value('cr_modul_harus_urut', ($editable)?$request['cr_modul_harus_urut']:'') == '1' ? "checked" : "checked";
+                                        echo set_value('cr_modul_harus_urut', ($editable)?$request['cr_modul_harus_urut']:'') == '1' ? "checked" : "";
                                         ?>> Ya
                                         <span></span>
                                     </label>
@@ -267,8 +266,33 @@
                     </div>
                 </div>
                 <!-- END PORTLET CONTENT -->
+                <!-- START DOCUMENTATION LINK --> 
+                <div class="kt-portlet kt-portlet--head-sm mt-4" data-ktportlet="true">
+                    <div class="kt-portlet__head">
+                        <div class="kt-portlet__head-label">
+                            <h3 class="kt-portlet__head-title text-primary">
+                                Dokumentasi Kelas
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="kt-portlet__body">
+                        <div class="row">
+                            <div class="col-md-12 xs-12 my-2">
+                                <span class="alert alert-info">* Masukkan link drive penyimpanan dokumen (Gdrive, onedrive, dsb)</span>
+                            </div>
+                            <div class="col-md-12 xs-12 my-2">
+                                <label for="linkabsen">Absensi</label>
+                                <input type="text" name="linkabsen" class="form-control" id="linkabsen">
+                            </div>
+                            <div class="col-md-12 xs-12 my-2">
+                                <label for="linkdokumentasi">Dokumentasi</label>
+                                <input type="text" name="linkdoc" class="form-control" id="linkdoc">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-
+                <!-- END DOCUMENTATION LINK -->
             </div>
 
             <div class="col-lg-5">
@@ -559,6 +583,7 @@
 
 <script>
 var kode_wallet = '';
+var status_wallet = '';
 </script>
 
 <script type="text/javascript">
@@ -588,6 +613,11 @@ var kode_wallet = '';
 				return false;
 			} else if(nil=="luar_app" && kode_wallet!="") {
 				alert('Kode AgroWallet wajib dikosongkan untuk opsi pelatihan yang dikelola di luar AgroNow (100% peserta dari Luar PTPN Group)');
+				return false;
+			}
+			
+			if(kode_wallet!="" && status_wallet.toLowerCase()!='jalan') {
+				alert("Status AgroWallet belum diubah menjadi 'Jalan/Diselenggarakan' oleh bagian pemasaran");
 				return false;
 			}
 			
@@ -767,6 +797,8 @@ var kode_wallet = '';
 					'</table>';
 				
 				$('#detail_lw_classroom').html(data);
+				kode_wallet = repo.kode;
+				status_wallet = repo.status_penyelenggaraan;
 				  
 				return repo.kode;
 			},
@@ -778,11 +810,12 @@ var kode_wallet = '';
 		$("#ajax_lw").on("select2:unselecting", function(e) {
 			$('#detail_lw_classroom').html("");
 			kode_wallet = '';
+			status_wallet = '';
 		});
-		// get selected kode wallet
+		/* // get selected kode wallet
 		$("#ajax_lw").on("select2:select", function (e) {
 			kode_wallet = $(e.currentTarget).val();
-		});
+		}); */
     });
 </script>
 

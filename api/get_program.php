@@ -6,7 +6,7 @@ if($_SERVER['HTTP_HOST']=='localhost') {
 	$host	 = "localhost";
 	$userSQL = "root";
 	$passSQL = "";
-	$db = "agronow_pa";
+	$db = "lppexternal_dbagronow2024_new";
 } else {
 	$host	 = "localhost";
 	$userSQL = "u579638955_usrlearning";
@@ -17,11 +17,11 @@ if($_SERVER['HTTP_HOST']=='localhost') {
 $con = mysqli_connect($host, $userSQL, $passSQL, $db);
 $result=array();
 
-$act=$_POST['act'];
-$progid=$_POST['param'];
+$act=$_GET['act'];
+$progid=$_GET['param'];
 if($act =="" || $progid ==""){
 	$result['status'] = "1";
-	$result['data'] = array();
+	$result['data'] = array($act,$progid);
 	$result['message'] = "Data Not Retrieved";
 }else{
 	switch($act){
@@ -63,10 +63,11 @@ if($act =="" || $progid ==""){
 				$sql .="FROM _classroom_member as cm ";
 				$sql .="JOIN _member as m ON m.member_id=cm.member_id  ";
 				$sql .=" JOIN _classroom as cr ON cr.cr_id=cm.cr_id ";
-				$sql .="where cm.cr_id='".$progid."' order by cm.cr_id";
+				$sql .="where cm.cr_id='".$progid."'";
 		
 				$res = mysqli_query($con,$sql);
 				while($row = mysqli_fetch_object($res)) {
+					$arrData[$row->namakelas]['sql']=$sql;
 					$arrData[$row->namakelas]['member'][]=$row->member;
 					$arrData[$row->namakelas]['nama'][]=$row->namamember;
 					$arrData[$row->namakelas]['NIP'][]=$row->NIP;

@@ -45,7 +45,7 @@ class Classroom_member_model extends CI_Model {
 
     function get_by_classroom($cr_id){
         $this->db->select('_classroom_member.*,_group.group_name, _member.member_name,_member.member_nip, _member.member_image, _klien.nama as nama_klien');
-		$this->db->from('_classroom_member');
+		$this->db->from('_classroom_member'); 
 		
 		$this->db->join('_member', '_member.member_id = _classroom_member.member_id', 'left');
 		// $this->db->join('_group', '_group.group_id = _member.group_id', 'left');

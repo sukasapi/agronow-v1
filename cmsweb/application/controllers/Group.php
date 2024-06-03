@@ -58,7 +58,7 @@ class Group extends CI_Controller {
             $row = array();
             $row['group_id']              = $item->group_id;
             $row['group_name']  = $item->group_name;
-			$row['group_code']  = $item->group_code;
+			$row['silsilah']  = $item->silsilah;
             $row['group_portal']  = $item->group_portal;
             $row['group_status']  = $item->group_status;
             $row['group_has_level']  = $item->group_has_level;
@@ -164,7 +164,7 @@ class Group extends CI_Controller {
             $created_by = NULL;
             $data = array(
                 'group_name'  => $post['group_name'],
-				'group_code'  => $post['group_code'],
+				'silsilah'  => $post['silsilah'],
                 'group_alias'  => slugify($post['group_name']),
                 'group_status'  => $post['group_status'],
                 'group_portal'  => $post['group_portal']?$post['group_portal']:'0',
@@ -224,7 +224,7 @@ class Group extends CI_Controller {
             $data = array(
                 'group_id'  => $post['group_id']==NULL?NULL:$post['group_id'],
                 'group_name'  => $post['group_name'],
-				'group_code'  => $post['group_code'],
+				'silsilah'  => $post['silsilah'],
                 'group_status'  => $post['group_status'],
                 'group_portal'  => $post['group_portal']?$post['group_portal']:'0',
                 'group_has_level'  => $post['group_has_level']?$post['group_has_level']:'0',

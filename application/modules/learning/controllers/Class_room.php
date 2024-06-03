@@ -1785,7 +1785,7 @@ class Class_room extends MX_Controller {
 				
 				// jika cr_show_nilai = 1 maka tampilkan grade
                 $grade = ($this->data['data']['cr_show_nilai']?$grade:'');
-                $targetPathPdf = $this->generate_sertifikat($dataSert, $grade, $number);
+                $targetPathPdf = $this->sertifikat_reset($dataSert, $grade, $number);
 				$step['CERTIFICATE'] = $targetPathPdf;
 
                 $recData = array();

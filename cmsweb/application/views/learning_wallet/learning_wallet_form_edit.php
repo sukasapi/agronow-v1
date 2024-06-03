@@ -43,12 +43,6 @@ $actual_link = urlencode($actual_link);
                             <div class="col-md-12 col-xs-12 text-center">
                                 <h4>Informasi Kelas</h4>
                             </div>
-                            <div class="col-md-12 col-xs-12"><input type="hidden" id="kelasid" name="kelasid" value="<?=$kelas[0]->idkelas?>">
-                                <div class="form-group">
-                                    <label for="kodekelas"> Kode Kelas</label>
-                                    <input readonly value="<?=$kelas[0]->kodekelas?>" placeholder= "kode dari pemasaran" required type="text" class="form-control" name="kodekelas" id="kodekelas">
-                                </div>
-                            </div>  
                             <div class="col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label for="klien">Klien</label>
@@ -85,10 +79,41 @@ $actual_link = urlencode($actual_link);
                                     </select>
                                 </div>
                             </div>
+							<div class="col-md-12 col-xs-12"><input type="hidden" id="kelasid" name="kelasid" value="<?=$kelas[0]->idkelas?>">
+                                <div class="form-group">
+                               
+                                    <label for="kodekelas">Kode Kelas<span class="text-danger"> *</span></label>
+                                    <input readonly value="<?=$kelas[0]->kodekelas?>" placeholder= "kode dari pemasaran" required type="text" class="form-control" name="kodekelas" id="kodekelas">
+                                </div>
+                            </div>  
+							<div class="col-md-12 col-xs-12 ">
+                                <div class="form-group">
+                                    <label for="sekolah">Sekolah</label>
+                                    <select class="form-control" name="sekolah" id="sekolah">
+                                    <?php 
+                                            foreach($sekolah as $s){
+                                              
+                                                if($kelas[0]->id_sekolah ==$s->id){
+                                                    echo "<option selected  value='".$s->id."'>".$s->nama."</option>";
+                                                }else{
+                                                    echo "<option  value='".$s->id."'>".$s->nama."</option>";
+                                                }
+                                              
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group">
-                                    <label for="namakelas"> Nama Kelas</label>
+                                    <label for="namakelas">Nama Kelas<span class="text-danger"> *</span></label>
                                     <input required type="text" value="<?=$kelas[0]->nama_kelas?>" placeholder="nama kelas" class="form-control" name="namakelas" id="namakelas">
+                                </div>
+                            </div>
+							<div class="col-md-12 col-xs-12 ">
+                                <div class="form-group">
+                                    <label for="pic">Penanggung jawab kelas</label>
+                                    <input type="text" class="form-control" name="pic" value="<?=$kelas[0]->pic?>" placeholder="Inisial penanggung jawab kelas (SME)" id="pic">
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12">
@@ -127,30 +152,6 @@ $actual_link = urlencode($actual_link);
                     <div class="kt-portlet__body">
                     <h5 class="text-center">Konfigurasi kelas</h5>
                     <div class="row mb-4">
-                            <div class="col-md-12 col-xs-12 ">
-                                <div class="form-group">
-                                    <label for="sekolah">Sekolah</label>
-                                    <select class="form-control" name="sekolah" id="sekolah">
-                                    <?php 
-                                            foreach($sekolah as $s){
-                                              
-                                                if($kelas[0]->id_sekolah ==$s->id){
-                                                    echo "<option selected  value='".$s->id."'>".$s->nama."</option>";
-                                                }else{
-                                                    echo "<option  value='".$s->id."'>".$s->nama."</option>";
-                                                }
-                                              
-                                            }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-xs-12 ">
-                                <div class="form-group">
-                                    <label for="harga">Harga</label>
-                                    <input type="text" class="form-control" value="<?=$kelas[0]->harga?>" placeholder="harga kelas per peserta" name="harga" id="harga">
-                                </div>
-                            </div>
                             <div class="col-md-6 col-xs-12">
                                 <div class="form-group">
                                     <label for="metode">Metode</label>
@@ -183,19 +184,25 @@ $actual_link = urlencode($actual_link);
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6 col-xs-12 ">
+							<div class="col-md-6 col-xs-12 ">
                                 <div class="form-group">
-                                    <label for="lokasi">Lokasi</label>
-                                    <input class="form-control" value="<?=$kelas[0]->lokasi_offline?>" type="text" name="lokasi" id="lokasi" placeholder="jika online, kosongkan">
+                                    <label for="hari">Jumlah hari</label>
+                                    <input readonly class="form-control" type="text" name="hari" id="hari" value="<?=$kelas[0]->durasi_hari?>">
                                 </div>
                             </div>
-                            <div class="col-md-4 col-xs-12 ">
+							<div class="col-md-6 col-xs-12 ">
                                 <div class="form-group">
-                                    <label for="tahun">tahun</label>
+                                    <label for="jam">Jam Pembelajaran<span class="text-danger"> *</span></label>
+                                    <input  class="form-control" type="number" name="jam" id="jam" value="<?=$kelas[0]->jumlah_jam?>">
+                                </div>
+                            </div>
+							<div class="col-md-4 col-xs-12 ">
+                                <div class="form-group">
+                                    <label for="tahun">Tahun</label>
                                     <input class="form-control" type="text" name="tahun" id="tahun" value="<?=$kelas[0]->tahun?>">
                                 </div>
                             </div>
-                            <div class="col-md-4 col-xs-12 ">
+							<div class="col-md-4 col-xs-12 ">
                                 <div class="form-group">
                                     <label for="mulai">Mulai</label>
                                     <input class="form-control" type="date" name="mulai" id="mulai" value="<?=$kelas[0]->tgl_mulai?>">
@@ -207,16 +214,16 @@ $actual_link = urlencode($actual_link);
                                     <input class="form-control" type="date" name="selesai" id="selesai" value="<?=$kelas[0]->tgl_selesai?>">
                                 </div>
                             </div>
-                            <div class="col-md-6 col-xs-12 ">
+							<div class="col-md-6 col-xs-12 ">
                                 <div class="form-group">
-                                    <label for="hari">Jumlah hari</label>
-                                    <input readonly class="form-control" type="text" name="hari" id="hari" value="<?=$kelas[0]->durasi_hari?>">
+                                    <label for="lokasi">Lokasi</label>
+                                    <input class="form-control" value="<?=$kelas[0]->lokasi_offline?>" type="text" name="lokasi" id="lokasi" placeholder="jika online, kosongkan">
                                 </div>
                             </div>
                             <div class="col-md-6 col-xs-12 ">
                                 <div class="form-group">
-                                    <label for="jam">Jam Pembelajaran</label>
-                                    <input  class="form-control" type="number" name="jam" id="jam" value="<?=$kelas[0]->jumlah_jam?>">
+                                    <label for="harga">Harga<span class="text-danger"> *</span></label>
+                                    <input type="text" class="form-control" value="<?=$kelas[0]->harga?>" placeholder="harga kelas per peserta" name="harga" id="harga">
                                 </div>
                             </div>
                             <div class="col-md-12 col-xs-12 ">
@@ -227,17 +234,12 @@ $actual_link = urlencode($actual_link);
                             </div>
                             <div class="col-md-12 col-xs-12 ">
                                 <div class="form-group">
-                                    <label for="pic">Penanggung jawab kelas</label>
-                                    <input type="text" class="form-control" name="pic" value="<?=$kelas[0]->pic?>" placeholder="Inisial penanggung jawab kelas (SME)" id="pic">
-                                </div>
-                            </div>
-                            <div class="col-md-12 col-xs-12 ">
-                                <div class="form-group">
                                     <label for="caper">Catatan Penyelenggaraan Kelas</label>
                                     <textarea class="form-control" nama="caper" id="caper"  placeholder="catatan penyelenggaraan kelas"><?=$kelas[0]->catatan_penyelenggaraan?></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-12 col-xs-12 ">
+							<!--
+                            <div class="col-md-12 col-xs-12">
                                 <div class="form-group">
                                     <div class="form-check">
                                         <?php 
@@ -259,6 +261,7 @@ $actual_link = urlencode($actual_link);
 
                                 </div>
                             </div>
+							-->
                          </div>
                          <hr/>
                     </div>
@@ -268,33 +271,22 @@ $actual_link = urlencode($actual_link);
             <div class="col-md-4 col-xs-12">
                 <div class="kt-portlet">
                     <div class="kt-portlet__body">
-                        <h5 class="text-center"> Kategori Kelas</h5>
+                        <h5 class="text-center">Gambar Kelas</h5>
                         <div class="text-center">
-                            <?php 
-                             $kategorikelas=explode(".",$kelas[0]->berkas);
-                             if($kategorikelas[0]=="default"){
-                                $kat="reguler";
-                             }else{
-                                $kat=$kategorikelas[0];
-                             }
-                            ?>
                             <div class="form-group">
                                 <select name="kategori" id="kategori" class="form-control">
                                     <?php   
-                                       
-                                       
                                         foreach($kategori as $k){
-                                          
-                                            if($kat==$k){
+                                            if($kelas[0]->berkas==$k){
                                                 echo "<option selected value='".$k."'>".$k."</option>";
                                             }else{
                                                 echo "<option value='".$k."'>".$k."</option>";
                                             }
-                                          
                                         }
                                     ?>
                                 </select>
                             </div>
+							<div class="row"><?=$kelas_berkas_ui?></div>
                     </div>
                 </div>
 
@@ -323,31 +315,49 @@ $actual_link = urlencode($actual_link);
                                 </div>
                             </div>
                          </div>
-                         <hr/>
                     </div>
                 </div>
-
-               
+                    <!--end::Form-->
             </div>
             <div class="col-md-12 col-xs-12">
                 <div class="kt-portlet">                
                     <div class="kt-portlet__body">
                         <div class="row">
                             <div class="col-md-12 col-xs-12 text-center">
+                                <h5>Status Kelas.</h5><br>
                                 <div class="form-group">
-                                    <label>Status Kelas</label>
-                                    <select id="status" name="status" class="form-control">
+                                    <select class="form-control" name="status_kelas" id="status_kelas">
                                         <?php 
-                                            foreach($status as $s){
-                                                if($s==$kelas[0]->status){
-                                                    echo "<option value='".$s."' selected >".$s."</option>";
+                                            foreach($status_kelas as $sk){
+                                                if($kelas[0]->status == $sk){
+                                                    echo "<option selected value='".$sk."'>".$sk."</option>";
                                                 }else{
-                                                    echo "<option value='".$s."'>".$s."</option>";
+                                                    echo "<option value='".$sk."'>".$sk."</option>";
                                                 }
+                                              
                                             }
                                         ?>
                                     </select>
                                 </div>
+
+                            </div>
+                            <div class="col-md-12 col-xs-12 text-center">
+                                <h5>Status Penyelenggaraan</h5><br>
+                                <div class="form-group">
+                                    <select class="form-control" name="status_penyelenggaraan" id="status_penyelenggaraan">
+                                        <?php 
+                                            foreach($status_penyelenggaraan as $sp){
+                                                if($kelas[0]->status_penyelenggaraan == $sp){
+                                                    echo "<option selected value='".$sp."'>".$sp."</option>";
+                                                }else{
+                                                    echo "<option value='".$sp."'>".$sp."</option>";
+                                                }
+                                              
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -361,11 +371,9 @@ $actual_link = urlencode($actual_link);
                                 <h5>Update Kelas Ini.</h5><br>
                                 <button class="btn btn-primary btn-block" id="btsave">Simpan data kelas</button>
                             </div>
-                         </div>
-                         <hr/>
+                        </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>
@@ -381,70 +389,81 @@ $actual_link = urlencode($actual_link);
 
         $("#btsave").on('click',function(e){
             e.preventDefault();
-            var data = new FormData();
-            var url=baseUrl+"learning_wallet/edit_kelas";
-            data.append("kodekelas",$("#kodekelas").val());
-            data.append("klien",$("#klien").val());
-            data.append("penyelenggara",$("#penyelenggara").val());
-            data.append("namakelas",$("#namakelas").val());
-            data.append("deskripsi",$("#deskripsi").val());
-            data.append("sasaran",$("#sasaran").val());
-            data.append("silabus",$("#silabus").val());
-            data.append("tag",$("#tag").val());
-            data.append("tahun",$("#tahun").val());
-            data.append("sekolah",$("#sekolah").val());
-            data.append("harga",$("#harga").val());
-            data.append("metode",$("#metode").val());
-            data.append("lokasi",$("#lokasi").val());
-            data.append("mulai",$("#mulai").val());
-            data.append("selesai",$("#selesai").val());
-            data.append("hari",$("#hari").val());
-            data.append("jam",$("#jam").val());
-            data.append("keterangan",$("#keterangan").val());
-            data.append("pic",$("#pic").val());
-            data.append("eco",$("#eco").val());
-            data.append("level",$("#level").val());
-            data.append("minimal",$("#minimal").val());
-            data.append("catatanlevel",$("#catatanlevel").val());
-            data.append("caper",$("#caper").val());
-            data.append("kelas",$("#kelasid").val());
-            data.append("kategori",$("#kategori").val());
-            data.append("status",$("#status").val());
-            /// image
-           
-            $.ajax({
-                type: "POST",
-                enctype: 'multipart/form-data',
-                url: url,
-                data: data,
-                processData: false,
-                contentType: false,
-                cache: false,
-                timeout: 800000,
-                success: function (response) {
-                    //console.log(response)
-                    var goto=baseUrl+'learning_wallet/pelatihan';
-                    var respon=JSON.parse(response);
-                    if(respon.status = "ok"){
-                        Swal.fire({
-                            type: 'success',
-                            title: 'Berhasil',
-                            text: respon.pesan,
-                            }).then(function(){
-                                location.replace(goto);
-                            });
-                    }else{
-                        Swal.fire({
-                            type: 'error',
-                            title: 'Upss',
-                            text: respon.pesan,
-                            }).then(function(){
-                                location.reload();
-                            });
+            if($("#kodekelas").val()=="" || $("#namakelas").val()=="" || $("#harga").val()=="" || $("#jam").val()==""){
+                Swal.fire({
+                    type: "error",
+                    title: "Data Belum Lengkap",
+                    text: "Cek kembali isian kode,nama dan harga kelas",
+                });
+            }else{
+                var data = new FormData();
+                var url=baseUrl+"learning_wallet/edit_kelas";
+                data.append("kodekelas",$("#kodekelas").val());
+                data.append("klien",$("#klien").val());
+                data.append("penyelenggara",$("#penyelenggara").val());
+                data.append("namakelas",$("#namakelas").val());
+                data.append("deskripsi",$("#deskripsi").val());
+                data.append("sasaran",$("#sasaran").val());
+                data.append("silabus",$("#silabus").val());
+                data.append("tag",$("#tag").val());
+                data.append("tahun",$("#tahun").val());
+                data.append("sekolah",$("#sekolah").val());
+                data.append("harga",$("#harga").val());
+                data.append("metode",$("#metode").val());
+                data.append("lokasi",$("#lokasi").val());
+                data.append("mulai",$("#mulai").val());
+                data.append("selesai",$("#selesai").val());
+                data.append("hari",$("#hari").val());
+                data.append("jam",$("#jam").val());
+                data.append("keterangan",$("#keterangan").val());
+                data.append("pic",$("#pic").val());
+                data.append("eco",$("#eco").val());
+                data.append("level",$("#level").val());
+                data.append("minimal",$("#minimal").val());
+                data.append("catatanlevel",$("#catatanlevel").val());
+                data.append("caper",$("#caper").val());
+                data.append("kelas",$("#kelasid").val());
+                data.append("kategori",$("#kategori").val());
+                data.append("status",$("#status_kelas").val());
+                data.append("status_penyelenggaraan",$("#status_penyelenggaraan").val());
+                /// image
+            
+                $.ajax({
+                    type: "POST",
+                    enctype: 'multipart/form-data',
+                    url: url,
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    timeout: 800000,
+                    success: function (response) {
+                        //console.log(response)
+                        var goto=baseUrl+'learning_wallet/pelatihan';
+                        var respon=JSON.parse(response);
+                        if(respon.status = "ok"){
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Berhasil',
+                                text: respon.pesan,
+                                }).then(function(){
+                                    location.replace(goto);
+                                });
+                        }else{
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Upss',
+                                text: respon.pesan,
+                                }).then(function(){
+                                    location.reload();
+                                });
+                        }
                     }
-                }
 
-            })
+                })
+            }
+           
+            
         })
 
         $("#cover").on("change",function(e){

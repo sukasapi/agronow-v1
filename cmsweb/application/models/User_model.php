@@ -3,7 +3,7 @@
 class User_model extends CI_Model {
 
     public function __construct(){
-        parent::__construct(); //inherit dari parent
+        parent::__construct(); //inherit dari pa rent
         $this->load->database();
     }
 

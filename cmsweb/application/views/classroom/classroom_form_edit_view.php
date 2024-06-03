@@ -11,7 +11,7 @@ $arrD_lw = $this->learning_wallet_model->getDetailPelatihan('detail',array('id'=
 
         </div>
         <div class="kt-subheader__toolbar">
-            <div class="kt-subheader__wrapper"> 
+            <div class="kt-subheader__wrapper">
                 <a href="<?php echo site_url("classroom/detail/".$classroom['cr_id']); ?>" class="btn kt-subheader__btn-primary">
                     <i class="flaticon2-back"></i>
                     Kembali
@@ -278,7 +278,43 @@ $arrD_lw = $this->learning_wallet_model->getDetailPelatihan('detail',array('id'=
                     </div>
                 </div>
                 <!-- END PORTLET CONTENT -->
+                <!-- START DOCUMENTATION LINK --> 
+                <div class="kt-portlet kt-portlet--head-sm mt-4" data-ktportlet="true">
+                    <div class="kt-portlet__head">
+                        <div class="kt-portlet__head-label">
+                            <h3 class="kt-portlet__head-title text-primary">
+                                Dokumentasi Kelas
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="kt-portlet__body">
+                        <div class="row">
+                            <div class="col-md-12 xs-12 my-2">
+                                <span class="alert alert-info">* Masukkan link drive penyimpanan dokumen (Gdrive, onedrive, dsb)</span>
+                            </div>
+                            <div class="col-md-12 xs-12 my-2">
+                                <label for="linkabsen">Absensi</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" name="linkabsen" class="form-control" id="linkabsen" value='<?=$request['lk_absen']?>'>
+                                    <div class="input-group-append">
+                                        <a href="<?=$request['lk_absen']?>" class="btn btn-success text-white" ><i class="fa-solid fa-chevron-right text-white"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 xs-12 my-2">
+                                <label for="linkdokumentasi">Dokumentasi</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" name="linkdoc" class="form-control" id="linkdoc" value='<?=$request['lk_dokumentasi']?>'>
+                                    <div class="input-group-append">
+                                        <a href="<?=$request['lk_dokumentasi']?>" class="btn btn-success"><i class="fa-solid fa-chevron-right text-white"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- END DOCUMENTATION LINK -->
 
             </div>
 
@@ -326,7 +362,7 @@ $arrD_lw = $this->learning_wallet_model->getDetailPelatihan('detail',array('id'=
 								?>
 									<table class="mt-1 table table-sm table-bordered">
 										<tr>
-											<td>status</td><td><?=$arrD_lw['status']?></td>
+											<td>status</td><td><?=$arrD_lw['status_penyelenggaraan']?></td>
 										</tr>
 										<tr>
 											<td>kode</td><td><?=$arrD_lw['kode']?></td>
@@ -662,6 +698,7 @@ $arrD_lw = $this->learning_wallet_model->getDetailPelatihan('detail',array('id'=
 
 <script>
 var kode_wallet = '<?=$arrD_lw['id']?>';
+var status_wallet = '<?=$arrD_lw['status_penyelenggaraan']?>';
 </script>
 
 <script type="text/javascript">
@@ -691,6 +728,11 @@ var kode_wallet = '<?=$arrD_lw['id']?>';
 				return false;
 			} else if(nil=="luar_app" && kode_wallet!="") {
 				alert('Kode AgroWallet wajib dikosongkan untuk opsi pelatihan yang dikelola di luar AgroNow (100% peserta dari Luar PTPN Group)');
+				return false;
+			}
+			
+			if(kode_wallet!="" && status_wallet.toLowerCase()!='jalan') {
+				alert("Status AgroWallet belum diubah menjadi 'Jalan/Diselenggarakan' oleh bagian pemasaran");
 				return false;
 			}
 			
@@ -878,7 +920,9 @@ var kode_wallet = '<?=$arrD_lw['id']?>';
 					'</table>';
 				
 				$('#detail_lw_classroom').html(data);
-				  
+				kode_wallet = repo.kode;
+				status_wallet = repo.status_penyelenggaraan;
+				
 				return repo.kode;
 			},
 			escapeMarkup: function (markup) {
@@ -889,11 +933,12 @@ var kode_wallet = '<?=$arrD_lw['id']?>';
 		$("#ajax_lw").on("select2:unselecting", function(e) {
 			$('#detail_lw_classroom').html("");
 			kode_wallet = '';
+			status_wallet = '';
 		});
-		// get selected kode wallet
+		/* // get selected kode wallet
 		$("#ajax_lw").on("select2:select", function (e) {
 			kode_wallet = $(e.currentTarget).val();
-		});
+		}); */
 		// 
 		var option = new Option(":::", "<?=$request['id_lw_classroom']?>", true, true);
 		$("#ajax_lw").append(option).trigger('change');
@@ -903,7 +948,7 @@ var kode_wallet = '<?=$arrD_lw['id']?>';
 <script>
     $( document ).ready(function() {
         var url='<?=base_url('classroom/')?>';  
-       
+
             $("input[name=ev_narsum]").on("change",function(e){
                 e.preventDefault();
                 var evaluasi=$("input[name=ev_narsum]:checked").val();

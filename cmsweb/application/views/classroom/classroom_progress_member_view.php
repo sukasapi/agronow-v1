@@ -512,7 +512,7 @@
 
                                         <td><?= isset($result['CT']['ctDate']) ? ($result['CT']['ctDate'] ? date('d/m/Y H:i',strtotime($result['CT']['ctDate'])) : '' ) :'' ?></td>
 
-                                        <td class="text-center"><?= $ctScore[1] ?></td>
+                                        <td class="text-center"><?= $ctScore[1] ?></td> 
 
                                         <td class="text-center"><?= $ctScore[2] ?></td>
 

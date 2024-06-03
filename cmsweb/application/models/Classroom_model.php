@@ -524,7 +524,7 @@ class Classroom_model extends CI_Model {
         $query =$this->db->get();
         $syn=$this->db->last_query();
         if(count((array)$query->result()) > 0){
-            $res= $query->result();
+            $res= $query->result(); 
         }else{
             $res=array();
         } 

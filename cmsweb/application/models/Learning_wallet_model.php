@@ -6,7 +6,7 @@ class Learning_wallet_model extends CI_Model {
         parent::__construct(); //inherit dari parent
         $this->load->database();
     }
-
+ 
 
     /* DATATABLE BEGIN */
     var $table = '_learning_wallet_classroom';
@@ -160,6 +160,203 @@ class Learning_wallet_model extends CI_Model {
 			}
 		}
 		return $url_berkas;
+	}
+	
+	public function get_detail_realisasi($id_entitas,$id_member,$tahun,$id_highlight,$generate_display) {
+		$id_entitas = (int) $id_entitas;
+		$id_member = (int) $id_member;
+		$id_highlight = (int) $id_highlight;
+		$tahun = (int) $tahun;
+		
+		$arrH = array();
+		if($generate_display==true) {
+			$arrH['table'] = '';
+			
+			// get data entitas
+			$sql = "select group_name from _group where group_id='".$id_entitas."' ";
+			$res = $this->db->query($sql);
+			$row = $res->result_array();
+			$group_name = $row[0]['group_name'];
+			
+			// get data karyawan
+			$sql = "select member_name, member_nip, id_level_karyawan from _member where member_id='".$id_member."' ";
+			$res = $this->db->query($sql);
+			$row = $res->result_array();
+			$member_name = $row[0]['member_name'];
+			$member_nip = $row[0]['member_nip'];
+			$id_level_karyawan = $row[0]['id_level_karyawan'];
+			
+			// get label id_level_karyawan
+			$sql = "select l.nama from _member_level_karyawan l, _group g where l.id_klien=g.id_klien and l.id='".$id_level_karyawan."' and g.group_id='".$id_entitas."' ";
+			$res = $this->db->query($sql);
+			$row = $res->result_array();
+			$level_karyawan = $row[0]['nama'];
+			
+			// get saldo awal
+			$sql = "select nilai from _learning_wallet_konfigurasi where tahun='2024' and kategori='group' and id_group='".$id_entitas."' and nama='lv_kary_".$id_level_karyawan."'";
+			$res = $this->db->query($sql);
+			$row = $res->result_array();
+			$saldo_awal = $row[0]['nilai'];
+			
+			// get target jpl
+			$sql = "select nilai from _learning_wallet_konfigurasi where tahun='0' and kategori='umum' and id_group='0' and nama='target_jam_pembelajaran'";
+			$res = $this->db->query($sql);
+			$row = $res->result_array();
+			$jpl_target = $row[0]['nilai'];
+			
+			$arrH['nama_entitas'] = $group_name;
+			$arrH['nama_karyawan'] = $member_name;
+			$arrH['nik_karyawan'] = $member_nip;
+			$arrH['id_level_karyawan'] = $id_level_karyawan;
+			$arrH['level_karyawan'] = $level_karyawan;
+			$arrH['nominal_target'] = $saldo_awal;
+			$arrH['jpl_target'] = $jpl_target;
+			
+			$arrStatusPengajuan = $this->getDaftarStatusPengajuan();
+		}
+		
+		$arrH['nominal_proyeksi'] = 0;
+		$arrH['jpl_proyeksi'] = 0;
+		$arrH['nominal_realisasi'] = 0;
+		$arrH['jpl_realisasi'] = 0;
+		
+		// data agrowallet (blm diputuskan jalan/tidak)
+		$sql =
+			"select
+				g.group_name, p.kode_status_current, 
+				c.id, c.kode, c.nama as nama_pelatihan, c.harga, c.jumlah_jam, c.tgl_selesai
+			 from _learning_wallet_classroom c, _learning_wallet_pengajuan p, _member m, _group g 
+			 where 
+				c.id=p.id_lw_classroom and p.id_member=m.member_id and m.group_id=g.group_id and 
+				m.group_id='".$id_entitas."' and p.id_member='".$id_member."' and c.tahun='".$tahun."' and 
+				c.status='aktif' and p.status='aktif' and p.kode_status_current>0 and c.status_penyelenggaraan='-' ";
+		$res = $this->db->query($sql);
+		$row = $res->result_array();
+		foreach($row as $key => $val) {
+			$arrH['nominal_proyeksi'] += $val['harga'];
+			$arrH['jpl_proyeksi'] += $val['jumlah_jam'];
+			
+			if($generate_display==true) {
+				$kategori1 = $arrStatusPengajuan[$val['kode_status_current']]['label'];
+				
+				if($val['kode_status_current']=="40") $kategori1 = 'sudah disetujui, menunggu status pelaksanaan pelatihan';
+				
+				$bg_tr = ($val['id']==$id_highlight)? 'bg-warning' : '';
+				$arrH['table'] .=
+					'<tr class="'.$bg_tr.'">
+						<td>W'.$val['id'].'</td>
+						<td>'.$val['kode'].'<br/>'.$val['nama_pelatihan'].'</td>
+						<td>'.$val['tgl_selesai'].'</td>
+						<td>'.$val['jumlah_jam'].'</td>
+						<td>'.number_format($val['harga'],2,',','.').'</td>
+						<td>rencana</td>
+						<td>'.$kategori1.'</td>
+					 </tr>';
+			}
+		}
+		
+		// data agrowallet diselenggarakan tp classroom agronow tidak ditemukan
+		$sql =
+			"select
+				w.id, w.kode, w.nama as nama_pelatihan, w.harga, w.jumlah_jam, w.tgl_selesai, p.kode_status_current
+			 from 
+			 _learning_wallet_classroom w 
+				left join _classroom c on w.id=c.id_lw_classroom 
+				inner join _learning_wallet_pengajuan p on w.id=p.id_lw_classroom 
+				inner join _member m on p.id_member=m.member_id
+				inner join _group g on m.group_id=g.group_id
+			where 
+				c.cr_id is null and 
+				m.group_id='".$id_entitas."' and p.id_member='".$id_member."' and w.tahun='".$tahun."' and 
+				p.status='aktif' and p.kode_status_current>0 and w.status_penyelenggaraan='jalan'";
+		$res = $this->db->query($sql);
+		$row = $res->result_array();
+		foreach($row as $key => $val) {
+			$arrH['nominal_proyeksi'] += $val['harga'];
+			$arrH['jpl_proyeksi'] += $val['jumlah_jam'];
+			
+			if($generate_display==true) {
+				$kategori1 = '';
+				if($val['kode_status_current']=="40") {
+					$kategori1 = 'belum diverifikasi, classroom AgroNow belum dibuat';
+				} else {
+					$kategori1 = 'pelatihan diselenggarakan tetapi Admin Entitas belum melakukan persetujuan';
+				}
+				
+				$arrH['table'] .=
+					'<tr>
+						<td>W'.$val['id'].'</td>
+						<td>'.$val['kode'].'<br/>'.$val['nama_pelatihan'].'</td>
+						<td>'.$val['tgl_selesai'].'</td>
+						<td>'.$val['jumlah_jam'].'</td>
+						<td>'.number_format($val['harga'],2,',','.').'</td>
+						<td>rencana</td>
+						<td>'.$kategori1.'</td>
+					 </tr>';
+			}
+		}
+		
+		// data agrowallet x agronow
+		$sql =
+			"select
+				c.cr_id, c.qc_member_id, g.group_name,
+				w.kode, w.nama as nama_pelatihan, w.harga, w.jumlah_jam, 
+				date_format(c.cr_date_end, '%Y-%m-%d') as tgl_selesai
+			 from _classroom c, _classroom_member cm, _member m, _group g, _learning_wallet_classroom w
+			 where 
+				c.cr_id=cm.cr_id and cm.member_id=m.member_id and cm.id_group=g.group_id and c.id_lw_classroom=w.id and
+				cm.id_group='".$id_entitas."' and m.member_id='".$id_member."' and w.tahun='".$tahun."' and
+				c.cr_status='publish' and cm.member_status='1' and cm.is_pk='0' and w.status_penyelenggaraan in ('-','jalan') ";
+		$res = $this->db->query($sql);
+		$row = $res->result_array();
+		foreach($row as $key => $val) {
+			$kategori1 = '';
+			$kategori2 = '';
+			if(!empty($val['qc_member_id'])) {
+				$kategori1 = 'sudah diverifikasi pengelola kelas';
+				$kategori2 = 'realisasi';
+				$arrH['nominal_realisasi'] += $val['harga'];
+				$arrH['jpl_realisasi'] += $val['jumlah_jam'];
+			} else {
+				$kategori1 = 'belum diverifikasi pengelola kelas [XQC]';
+				$kategori2 = 'rencana';
+				$arrH['nominal_proyeksi'] += $val['harga'];
+				$arrH['jpl_proyeksi'] += $val['jumlah_jam'];
+			}
+			
+			if($generate_display==true) {
+				$arrH['table'] .=
+					'<tr>
+						<td>N'.$val['cr_id'].'</td>
+						<td>'.$val['kode'].'<br/>'.$val['nama_pelatihan'].'</td>
+						<td>'.$val['tgl_selesai'].'</td>
+						<td>'.$val['jumlah_jam'].'</td>
+						<td>'.number_format($val['harga'],2,',','.').'</td>
+						<td>'.$kategori2.'</td>
+						<td>'.$kategori1.'</td>
+					 </tr>';
+			}
+		}
+		
+		$arrH['jpl_total'] = $arrH['jpl_realisasi']+$arrH['jpl_proyeksi'];
+		$arrH['nominal_total'] = $arrH['nominal_realisasi']+$arrH['nominal_proyeksi'];
+		
+		if($generate_display==true) {
+			$arrH['table'] =
+				'<tr>
+					<td class="bg-success text-light">ID</td>
+					<td class="bg-success text-light">Pelatihan</td>
+					<td class="bg-success text-light">Tanggal Selesai</td>
+					<td class="bg-success text-light">JPL</td>
+					<td class="bg-success text-light">Harga</td>
+					<td class="bg-success text-light">Kategori</td>
+					<td class="bg-success text-light">Status</td>
+				</tr>'.$arrH['table'].'';
+		}
+		
+		$arrH['nominal_total'] = $arrH['nominal_realisasi'] + $arrH['nominal_proyeksi'];
+		
+		return $arrH;
 	}
 	
 	public function get_noWA($idm=null){
